@@ -1,0 +1,30 @@
+extends layout
+
+block centercontent
+  h1 Hentai-Foundry Options
+  form.hentaiFoundryOptions.mt-2.mb-2
+    div.form-group
+      label(for='userToAdd') User to Add
+      input.form-control(type='text'
+        name='userToAdd'
+        placeholder='Enter User to Add')
+    div.form-group
+    button.btn.btn-primary Add User
+  div.mt-2.mb-2
+    ul.list-group
+      each watcher in watchedusers
+        if watcher.active === 1
+          li.list-group-item(id=watcher.user)
+            button.btn.btn-danger(type='button' data-name=watcher.user).deactivate-user Deactivate
+            span.ml-3= watcher.user
+            span.badge.badge-primary.badge-pill.float-right= watcher.count
+  div.mt-2.mb-2
+    ul.list-group
+      each watcher in watchedusers
+        if watcher.active === 0
+          li.list-group-item(id=watcher.user)
+            button.btn.btn-success(type='button' data-name=watcher.user).activate-user Activate
+            button.btn.btn-danger(type='button' data-name=watcher.user).delete-user.ml-3 Delete
+            span.ml-3= watcher.user
+            span.badge.badge-primary.badge-pill.float-right= watcher.count
+  script(src='/javascripts/options/hentaifoundry.js')

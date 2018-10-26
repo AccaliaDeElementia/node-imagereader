@@ -1,0 +1,106 @@
+extends layout
+
+
+block navigation
+  -const menuImage = '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><path d="M0 0v1h8v-1h-8zm0 2.97v1h8v-1h-8zm0 3v1h8v-1h-8z" transform="translate(0 1)" /></svg>'
+  div.d-inline-block.mr-auto.ml-auto.title= data.name
+  div.d-inline-block
+    button.btn#mainMenuItem !{menuImage}
+
+block content
+  - const directoryImage = '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><path d="M0 0v2h8v-1h-5v-1h-3zm0 3v4.5c0 .28.22.5.5.5h7c.28 0 .5-.22.5-.5v-4.5h-8z" /></svg>'
+  - const pictureImage = '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><path d="M0 0v8h8v-8h-8zm1 1h6v3l-1-1-1 1 2 2v1h-1l-4-4-1 1v-3z" /></svg>'
+  script.
+    const picturereaderdata = !{JSON.stringify(data)}
+  - const parentPath = `/show${data.parent}`
+  div.container-fluid.p-0#mainImage
+    img(src=data.current style='display: none;')
+  div.container.bg-light#mainMenu(style='display: none;')
+    - hasPictures = data.pictures.length > 0 ? 'has-pictures' : 'no-pictures'
+    div(class=`d-flex justify-content-center action-block ${hasPictures}`)
+        - 
+          const actions = [{
+            name: 'First',
+            image: '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><path d="M0 0v6h2v-6h-2zm2 3l5 3v-6l-5 3z" transform="translate(0 1)" /></svg>'
+          }, {
+            name: 'Previous',
+            image: '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><path d="M4 0l-4 3 4 3v-6zm0 3l4 3v-6l-4 3z" transform="translate(0 1)" /></svg>'
+          }, {
+            name: 'Random',
+            image: '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><path d="M6 0v1h-.5c-.35 0-.56.1-.78.38l-1.41 1.78-1.53-1.78c-.22-.26-.44-.38-.78-.38h-1v1h1c-.05 0 .01.04.03.03l1.63 1.91-1.66 2.06h-1v1h1c.35 0 .56-.1.78-.38l1.53-1.91 1.66 1.91c.22.26.44.38.78.38h.25v1l2-1.5-2-1.5v1h-.22c-.01-.01-.05-.04-.06-.03l-1.75-2.06 1.53-1.91h.5v1l2-1.5-2-1.5z" /></svg>'
+          }, {
+            name: 'Bookmark',
+            image: '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><path d="M0 0v8l2-2 2 2v-8h-4z" transform="translate(2)" /></svg>'
+          }, {
+            name: 'Next',
+            image: '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><path d="M0 0v6l4-3-4-3zm4 3v3l4-3-4-3v3z" transform="translate(0 1)" /></svg>'
+          }, {
+            name: 'Last',
+            image: '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><path d="M0 0v6l5-3-5-3zm5 3v3h2v-6h-2v3z" transform="translate(0 1)" /></svg>'
+          }]
+        each action in actions  
+          div(class=`card d-inline-block m-2 action-${action.name.toLowerCase()}`)
+            div.card-img-top !{action.image}
+            div.card-body
+              h5.card-title.text-center= action.name
+    div(class=`menu-block ${hasPictures}`)
+      ul.nav.nav-tabs(role="tablist")
+        li.nav-item
+          a.nav-link.active#folders-tab(data-toggle="tab" href="#folders" role="tab") Folders
+        li.nav-item
+          a.nav-link#pictures-tab(data-toggle="tab" href="#pictures" role="tab") Pictures
+        li.nav-item
+          a.nav-link#bookmarks-tab(data-toggle="tab" href="#bookmarks" role="tab") Bookmarks
+        li.nav-item
+          a.nav-link#settings-tab(href="/settings" role="tab") Settings
+      div.tab-content
+        div.tab-pane.active#folders(role="tabpanel")
+          h3 Folders
+          div.d-fled.flex-wrap.justify-content-center.w-100
+            if data.name !== ''
+              div.card.d-inline-block.m-2
+                a(href=parentPath)
+                  div.card-img-top !{directoryImage}
+                div.card-body
+                  h5.card-title
+                    a(href=parentPath) Parent
+            each folder in data.folders
+              div.card.d-inline-block.m-2
+                a(href=folder.path)
+                  if folder.current
+                    img.card-img-top(src=folder.current alt=folder.name)
+                  else
+                    div.card-img-top !{directoryImage}
+                div.card-body
+                  h5.card-title
+                    a(href=folder.path)= folder.name
+                  div.progress
+                    - const width = `width: ${folder.percent}%`
+                    div.progress-bar(role="progressbar" style=width aria-valuenow=folder.percent aria-valuemin="0" aria-valuemax="100")
+        div.tab-pane#pictures(role="tabpanel")
+          h3 Pictures
+          div.d-fled.flex-wrap.justify-content-center.w-100
+            each picture, index in data.pictures
+              -const cssclass = picture.seen ? 'seen' : 'unseen' 
+              div(class=`card d-inline-block m-2 ${cssclass}`, data-index=index)
+                div.card-body
+                  h5.card-title
+                    span !{pictureImage}
+                    span= picture.name
+        div.tab-pane#bookmarks(role="tabpanel")
+          h3 Bookmarks
+          div.d-fled.flex-wrap.justify-content-center.w-100
+            each bookmark in bookmarks 
+              div.card.d-inline-block.m-2(data-link=bookmark.link)
+                a(href=bookmark.link)
+                  img.card-img-top(src=bookmark.path alt=bookmark.name)
+                div.card-body
+                  h5.card-title
+                    a(href=bookmark.link)= bookmark.name
+                div.card-footer
+                  button.remove.btn.btn-danger(type="button" aria-label="Remove") Remove Bookmark
+  div.fixed-bottom.text-center.status-bar.text-border
+    span.float-left.left  
+    span.center 
+    span.float-right.right 
+  script(src='/javascripts/index.js')

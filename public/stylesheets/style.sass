@@ -1,0 +1,92 @@
+body
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif
+  nav
+    height: 4rem
+  .container, .container-fluid
+    position: absolute
+    top: 4rem
+    left: 0
+    right: 0
+    bottom: 0
+
+#mainImage img
+  max-width: 100%
+  width: 100%
+  max-height: 100%
+  height: 100%
+  object-fit: contain
+
+#mainMenu
+  position: absolute
+
+  .action-block.has-pictures
+    position: absolute
+    top: 0
+    left: 0
+    right: 0
+    height: 10rem
+  .menu-block.has-pictures
+    overflow-y: scroll
+    position: absolute
+    top: 10rem
+    left: 0
+    right: 0
+    bottom: 0
+  .action-block.no-pictures
+    display: none !important
+  .menu-block.no-pictures
+    overflow-y: scroll
+    position: absolute
+    top: 0
+    left: 0
+    right: 0
+    bottom: 0
+
+  #folders .card
+    width: 15rem
+    .card-img-top
+      width: 15rem
+      height: 20rem
+      object-fit: contain
+    .card-img-top svg
+      width: 15rem
+      height: 20rem
+  #pictures .card
+    width: 30rem
+    svg
+      width: 1rem
+      height: 1rem
+      margin-right: .2rem
+  #bookmarks .card
+    width: 15rem
+    .card-img-top
+      width: 15rem
+      height: 20rem
+      object-fit: contain
+    .card-img-top svg
+      width: 15rem
+      height: 20rem
+
+  .action-block .card
+    cursor: pointer
+    width: 10rem
+    .card-img-top
+      width: 10rem
+      height: 4rem
+      object-fit: contain
+    .card-img-top svg
+      width: 10rem
+      height: 4rem
+
+  .card.seen
+    color: #00bc8c
+    svg
+      fill: #00bc8c
+  .card.unseen
+    svg
+      fill: #222
+.text-border
+  font-weight: bold
+  font-size: 1rem
+  text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white
+  color: #000
