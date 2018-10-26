@@ -7,9 +7,10 @@ const { posix: { dirname, basename, extname, sep } } = require('path')
 
 const debug = require('debug')('picturereader:routes:pictures')
 
-const naturalOrder = (list, keyExtractor = key => key) => {
+const naturalOrder = (list, keyExtractor = key => key, numberExtendTo = 20) => {
+  const base = '0'.repeat(numberExtendTo)
   list.forEach(item => {
-    item.__key = `${keyExtractor(item)}`.replace(/(\d+)/g, num => `00000000000000000000${num}`.slice(-20))
+    item.__key = `${keyExtractor(item)}`.replace(/(\d+)/g, num => `${base}${num}`.slice(-numberExtendTo))
   })
   list.sort((a, b) => {
     if (a.__key < b.__key) {
@@ -59,7 +60,6 @@ async function listing (db, folder, recurse = true) {
   if (folder[folder.length - 1] !== sep) {
     folder += sep
   }
-  console.log(folder)
   const imageCount = (await db('pictures').count('id as total').where('folder', 'like', `${folder}%`))[0].total
   const seenImages = (await db('pictures').count('id as total').where('folder', 'like', `${folder}%`).where({ seen: true }))[0].total
   const folderInfo = (await db('folders').select(['path', 'current']).where({ path: folder }))[0] || {}

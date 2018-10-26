@@ -12,7 +12,7 @@ ADD . /app
 VOLUME /images
 VOLUME /data
 
-RUN chown -R node:node /app
+RUN chown -R node:node /app /data
 
 USER node
 RUN /usr/local/bin/npm install

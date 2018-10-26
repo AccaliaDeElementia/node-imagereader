@@ -2,7 +2,6 @@ const config = require('./config')
 
 const initialize = async () => {
   const dbname = config.readValue('DB_NAME', './mydb.sqlite')
-  console.log(dbname)
   const knex = require('knex')({
     client: 'sqlite3',
     connection: {
