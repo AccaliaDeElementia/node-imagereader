@@ -9,10 +9,12 @@ ENV DEBIAN_FRONTEND noninteractive
 WORKDIR /app
 ADD . /app
 
-VOLUME /images
-VOLUME /data
 
-RUN chown -R node:node /app /data
+RUN mkdir /data \
+  && \
+  chown -R node:node /app \
+  && \
+  chown -R node:node /data
 
 USER node
 RUN /usr/local/bin/npm install
@@ -20,5 +22,9 @@ RUN /usr/local/bin/npm install
 EXPOSE 3000/tcp
 
 ENV PICREAD_DB_NAME /data/persistance.sqlite
+
+
+VOLUME /images
+VOLUME /data
 
 CMD ["/usr/local/bin/node", "/app/app.js"]
