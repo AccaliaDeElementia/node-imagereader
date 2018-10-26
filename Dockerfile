@@ -4,7 +4,7 @@ LABEL maintainer="docker@elementia.me"
 
 ENV DEBIAN_FRONTEND noninteractive
 
-USER node
+
 
 WORKDIR /app
 ADD . /app
@@ -12,6 +12,9 @@ ADD . /app
 VOLUME /images
 VOLUME /data
 
+RUN chown -R node:node /app
+
+USER node
 RUN /usr/local/bin/npm install
 
 EXPOSE 3000/tcp
