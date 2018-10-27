@@ -61,3 +61,5 @@ typings/
 .next
 
 mydb.sqlite
+mydb.sqlite-journal
+test.js

@@ -91,13 +91,14 @@ async function listing (db, folder, recurse = true) {
         totalCount: 0,
         firstImage: null
       })
+    const firstImage = folderInfo.current ? folderInfo.current : counts.firstImage
     return {
       path: '/show' + path,
       name: basename(path),
       parent: dirname(path + sep),
       percent: counts.totalSeen / counts.totalCount * 100,
       imageCount: counts.totalCount,
-      current: '/images' + (folderInfo.current ? folderInfo.current : counts.firstImage)
+      current: firstImage ? '/images' + firstImage : null
     }
   }
   const result = await (getFolder(folder))
