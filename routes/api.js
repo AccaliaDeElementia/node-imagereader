@@ -81,6 +81,7 @@ async function listing (db, folder, recurse = true) {
     name: basename(folder),
     parent: dirname(folder + sep),
     percent: seenImages / imageCount * 100,
+    imageCount,
     current: folderInfo.current ? '/images' + folderInfo.current : (pictures[0] || {}).path
   }
   if (recurse) {
@@ -94,6 +95,7 @@ async function setLatest (db, path) {
   path = path.replace(/^\/images/, '')
   const folder = dirname(path) + sep
   await db('folders').update({ current: path }).where({ path: folder })
+  await db('pictures').update({ seen: true }).where({ path })
 }
 
 async function getBookmarks (db) {
@@ -159,11 +161,7 @@ module.exports = (db) => {
     res.redirect(await goToBookmark(db, req.params.id))
   })
 
-  const oneHour = 60 * 60 * 1000
-  setInterval(() => synchronizeDb(db), oneHour)
-  synchronizeDb(db)
-
   return router
 }
 
-module.exports.api = { listing, getBookmarks }
+module.exports.api = { listing, getBookmarks, synchronizeDb }

@@ -3,6 +3,10 @@ const config = require('./utils/config')
 const debug = require('debug')('picturereader:server')
 const express = require('express')
 
+const persistance = require('./utils/persistance')
+
+const api = require('./routes/api')
+
 // Express boilerplate
 async function setupMiddleware () {
   // view engine setup
@@ -32,10 +36,9 @@ async function setupMiddleware () {
 }
 
 async function createRouters (app) {
-  const persistance = require('./utils/persistance')
   const db = await persistance.initialize
   const indexRouter = require('./routes/index')(db)
-  const apiRouter = require('./routes/api')(db)
+  const apiRouter = api(db)
   const settingsRouter = require('./routes/settings')(db)
   app.use('/', indexRouter)
   app.use('/api', apiRouter)
@@ -86,11 +89,38 @@ async function startServer (app) {
   server.listen(config.port)
 }
 
+const oneHour = 60 * 60 * 1000
+const oneDay = 24 * oneHour
+
+const synchronizers = [{
+  runner: (db) => hentaifoundry.sync(),
+  baseTime: oneDay,
+  scheduled: Date.now() + (Math.random() - 0.5) * oneDay,
+  running: false
+}, {
+  runner: (db) => api.api.synchronizeDb(db),
+  baseTime: oneHour,
+  scheduled: 0,
+  running: false
+}]
+
+function runTick (db) {
+  const now = Date.now()
+  synchronizers
+    .filter(sync => !sync.running && sync.scheduled < now)
+    .forEach(async sync => {
+      sync.running = true
+      await sync.runner(db)
+      sync.running = false
+      sync.scheduled = Date.now() + sync.baseTime + (Math.random() - 0.5) * sync.baseTime
+    })
+}
+
 const hentaifoundry = require('./utils/hentaifoundry')
 async function runSynchronizers () {
-  await hentaifoundry.sync()
-  const oneDay = 24 * 60 * 60 * 1000
-  setInterval(() => hentaifoundry.sync(), oneDay)
+  const db = await persistance.initialize
+  setInterval(() => runTick(db), 60 * 1000)
+  runTick(db)
 }
 
 setupMiddleware()
