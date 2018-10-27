@@ -8,8 +8,13 @@ block navigation
     button.btn#mainMenuItem !{menuImage}
 
 block content
-  - const directoryImage = '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><path d="M0 0v2h8v-1h-5v-1h-3zm0 3v4.5c0 .28.22.5.5.5h7c.28 0 .5-.22.5-.5v-4.5h-8z" /></svg>'
-  - const pictureImage = '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><path d="M0 0v8h8v-8h-8zm1 1h6v3l-1-1-1 1 2 2v1h-1l-4-4-1 1v-3z" /></svg>'
+  -
+    const encode = path => {
+      const mapper = str => encodeURIComponent(str).replace(/#/g, '%35')
+      return path.split('/').map(mapper).join('/')
+    }
+    const directoryImage = '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><path d="M0 0v2h8v-1h-5v-1h-3zm0 3v4.5c0 .28.22.5.5.5h7c.28 0 .5-.22.5-.5v-4.5h-8z" /></svg>'
+    const pictureImage = '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><path d="M0 0v8h8v-8h-8zm1 1h6v3l-1-1-1 1 2 2v1h-1l-4-4-1 1v-3z" /></svg>'
   script.
     const picturereaderdata = !{JSON.stringify(data)}
   - const parentPath = `/show${data.parent}`
@@ -68,7 +73,7 @@ block content
               div.card.d-inline-block.m-2
                 a(href=folder.path)
                   if folder.current
-                    img.card-img-top(src=folder.current alt=folder.name)
+                    img.card-img-top(src=encode(folder.current) alt=folder.name)
                   else
                     div.card-img-top !{directoryImage}
                 div.card-body
