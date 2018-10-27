@@ -1,6 +1,5 @@
 const express = require('express')
 
-const { delay } = require('../utils/utils')
 const config = require('../utils/config')
 const fswalker = require('../utils/fswalker')
 const { posix: { dirname, basename, extname, sep } } = require('path')
@@ -29,8 +28,17 @@ const naturalOrder = (list, keyExtractor = key => key, numberExtendTo = 20) => {
 const synchronizeDb = async (db) => {
   const checkedAt = Date.now()
   debug('picture synchronization begins')
+  let count = 0
+  let dirs = 0
+  let files = 0
   await fswalker(config.imageRoot, async ({ path, isFile }) => {
     try {
+      count++
+      if (isFile) {
+        files++
+      } else {
+        dirs++
+      }
       if (!isFile && path[path.length - 1] !== sep) {
         path += sep
       }
@@ -41,15 +49,14 @@ const synchronizeDb = async (db) => {
       const dest = isFile ? 'pictures' : 'folders'
       const result = await db(dest).update({ checkedAt }).where({ path })
       if (result === 0) {
-        debug(`found NEW ${isFile ? 'file' : 'directory'} : {${path}}`)
         await db(dest).insert({ checkedAt, path, folder })
-      } else {
-        debug(`found ${isFile ? 'file' : 'directory'} : {${path}}`)
+      }
+      if (count % 20 === 0) {
+        debug(`Found ${dirs} dirs and ${files} files`)
       }
     } catch (e) {
       console.error(e, e.stacktrace)
     }
-    await delay()
   })
   await db('pictures').delete().whereNot({ checkedAt })
   await db('folders').delete().whereNot({ checkedAt })
@@ -60,13 +67,44 @@ async function listing (db, folder, recurse = true) {
   if (folder[folder.length - 1] !== sep) {
     folder += sep
   }
-  const imageCount = (await db('pictures').count('id as total').where('folder', 'like', `${folder}%`))[0].total
-  const seenImages = (await db('pictures').count('id as total').where('folder', 'like', `${folder}%`).where({ seen: true }))[0].total
-  const folderInfo = (await db('folders').select(['path', 'current']).where({ path: folder }))[0] || {}
+  const folderInfos = await db('pictures')
+    .select('folder')
+    .count('* as totalCount')
+    .sum('seen as totalSeen')
+    .min('path as firstImage')
+    .groupBy('folder')
+    .where('folder', 'like', `${folder}%`)
+  const getFolder = async path => {
+    const folderInfo = (await db('folders').select(['path', 'current']).where({ path }))[0] || {}
+    const counts = folderInfos
+      .filter(i => i.folder.substring(0, path.length) === path)
+      .reduce((accumulator, current) => {
+        accumulator.totalSeen += current.totalSeen
+        accumulator.totalCount += current.totalCount
+        if (current.folder === path) {
+          accumulator.firstImage = current.firstImage
+        }
+        return accumulator
+      },
+      {
+        totalSeen: 0,
+        totalCount: 0,
+        firstImage: null
+      })
+    return {
+      path: '/show' + path,
+      name: basename(path),
+      parent: dirname(path + sep),
+      percent: counts.totalSeen / counts.totalCount * 100,
+      imageCount: counts.totalCount,
+      current: '/images' + (folderInfo.current ? folderInfo.current : counts.firstImage)
+    }
+  }
+  const result = await (getFolder(folder))
   let folders = []
   if (recurse) {
     for (let dir of await db('folders').select(['path', 'current']).where({ folder })) {
-      folders.push(await listing(db, dir.path, false))
+      folders.push(await getFolder(dir.path))
     }
     folders = naturalOrder(folders, i => i.name.toLowerCase())
   }
@@ -76,18 +114,8 @@ async function listing (db, folder, recurse = true) {
     picture.path = '/images' + picture.path
   })
   pictures = naturalOrder(pictures, i => i.name.toLowerCase())
-  const result = {
-    path: '/show' + folder,
-    name: basename(folder),
-    parent: dirname(folder + sep),
-    percent: seenImages / imageCount * 100,
-    imageCount,
-    current: folderInfo.current ? '/images' + folderInfo.current : (pictures[0] || {}).path
-  }
-  if (recurse) {
-    result.folders = folders
-    result.pictures = pictures
-  }
+  result.folders = folders
+  result.pictures = pictures
   return result
 }
 
