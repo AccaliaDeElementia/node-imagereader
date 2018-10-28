@@ -71,14 +71,14 @@ block content
                     a(href=parentPath) Parent
             each folder in data.folders
               div.card.d-inline-block.m-2
-                a(href=folder.path)
+                a(href=encode(folder.path))
                   if folder.current
                     img.card-img-top(src=encode(folder.current) alt=folder.name)
                   else
                     div.card-img-top !{directoryImage}
                 div.card-body
                   h5.card-title
-                    a(href=folder.path)= folder.name
+                    a(href=encode(folder.path))= folder.name
                   div.progress
                     - const width = `width: ${folder.percent}%`
                     div.progress-bar(role="progressbar" style=width aria-valuenow=folder.percent aria-valuemin="0" aria-valuemax="100")= folder.imageCount
