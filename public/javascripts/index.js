@@ -155,11 +155,11 @@ if (!picturereaderdata.pictures.length) {
       }
     } else {
       if (endTouch.screenX < pageWidth / 3) {
-        navigation.prevImage()
+        // navigation.prevImage()
       } else if (endTouch.screenX < pageWidth * 2 / 3) {
         $('#mainMenu').show()
       } else {
-        navigation.nextImage()
+        // navigation.nextImage()
       }
     }
   }
