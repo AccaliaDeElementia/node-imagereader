@@ -6,6 +6,12 @@ const { posix: { dirname, basename, extname, sep } } = require('path')
 
 const debug = require('debug')('picturereader:routes:pictures')
 
+const toSortKey = path => {
+  const name = basename(path)
+  const base = '0'.repeat(30)
+  return name.replace(/(\d+)/g, num => `${base}${num}`.slice(-30))
+}
+
 const naturalOrder = (list, keyExtractor = key => key, numberExtendTo = 20) => {
   const base = '0'.repeat(numberExtendTo)
   list.forEach(item => {
@@ -47,9 +53,10 @@ const synchronizeDb = async (db) => {
         folder += sep
       }
       const dest = isFile ? 'pictures' : 'folders'
-      const result = await db(dest).update({ checkedAt }).where({ path })
+      const sortKey = toSortKey(path)
+      const result = await db(dest).update({ checkedAt, sortKey }).where({ path })
       if (result === 0) {
-        await db(dest).insert({ checkedAt, path, folder })
+        await db(dest).insert({ checkedAt, path, folder, sortKey })
       }
       if (count % 20 === 0) {
         debug(`Found ${dirs} dirs and ${files} files`)
@@ -67,20 +74,31 @@ async function listing (db, folder, recurse = true) {
   if (folder[folder.length - 1] !== sep) {
     folder += sep
   }
-  const folderInfos = await db('pictures')
+  const folderInfoSubQuery = db('pictures')
     .select('folder')
     .count('* as totalCount')
-    .sum('seen as totalSeen')
-    .min('path as firstImage')
+    .sum({ totalSeen: db.raw('CASE WHEN seen THEN 1 ELSE 0 END') })
+    .min('sortKey as firstImage')
     .groupBy('folder')
     .where('folder', 'like', `${folder}%`)
+    .as('folderInfos')
+  const folderInfos = await db('pictures')
+    .select(
+      'pictures.folder as folder',
+      'pictures.path as firstImage',
+      'folderInfos.totalCount as totalCount',
+      'folderInfos.totalSeen as totalSeen')
+    .join(folderInfoSubQuery, function () {
+      this.on('folderInfos.firstImage', '=', 'pictures.sortKey')
+        .andOn('folderInfos.folder', '=', 'pictures.folder')
+    })
   const getFolder = async path => {
     const folderInfo = (await db('folders').select(['path', 'current']).where({ path }))[0] || {}
     const counts = folderInfos
       .filter(i => i.folder.substring(0, path.length) === path)
       .reduce((accumulator, current) => {
-        accumulator.totalSeen += current.totalSeen
-        accumulator.totalCount += current.totalCount
+        accumulator.totalSeen += +current.totalSeen
+        accumulator.totalCount += +current.totalCount
         if (current.folder === path) {
           accumulator.firstImage = current.firstImage
         }
@@ -104,17 +122,15 @@ async function listing (db, folder, recurse = true) {
   const result = await (getFolder(folder))
   let folders = []
   if (recurse) {
-    for (let dir of await db('folders').select(['path', 'current']).where({ folder })) {
+    for (let dir of await db('folders').select(['path', 'current']).where({ folder }).orderBy('sortKey')) {
       folders.push(await getFolder(dir.path))
     }
-    folders = naturalOrder(folders, i => i.name.toLowerCase())
   }
-  let pictures = await db('pictures').select(['path', 'seen']).where({ folder })
+  let pictures = await db('pictures').select(['path', 'seen']).where({ folder }).orderBy('sortKey')
   pictures.forEach(picture => {
     picture.name = basename(picture.path, extname(picture.path))
     picture.path = '/images' + picture.path
   })
-  pictures = naturalOrder(pictures, i => i.name.toLowerCase())
   result.folders = folders
   result.pictures = pictures
   return result
