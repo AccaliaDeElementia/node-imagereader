@@ -13,17 +13,17 @@ exports.up = function (knex, Promise) {
     }),
     knex.schema.createTable('pictures', (table) => {
       table.increments('id').primary()
-      table.string('folder')
-      table.string('path')
-      table.integer('checkedAt')
+      table.string('folder', 8192)
+      table.string('path', 8192)
+      table.bigInteger('checkedAt')
       table.boolean('seen').notNullable().defaultTo(false)
     }),
     knex.schema.createTable('folders', (table) => {
       table.increments('id').primary()
-      table.string('folder')
-      table.string('path')
-      table.string('current')
-      table.integer('checkedAt')
+      table.string('folder', 8192)
+      table.string('path', 8192)
+      table.string('current', 8192)
+      table.bigInteger('checkedAt')
       table.boolean('seen').notNullable().defaultTo(false)
     }),
     knex.schema.createTable('bookmarks', (table) => {
