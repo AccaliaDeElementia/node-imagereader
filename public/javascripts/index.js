@@ -114,12 +114,17 @@ if (!picturereaderdata.pictures.length) {
   }).on('touchend', event => {
     const touch = event.originalEvent.changedTouches[0]
     if (pendingTouch && pendingTouch.identifier === touch.identifier) {
-      handleGesture(pendingTouch, touch)
+      if (!window.visualViewport || window.visualViewport.scale === 1) {
+        handleGesture(pendingTouch, touch)
+      }
       pendingTouch = null
     }
   }).on('click', evt => {
     if ($('#mainMenu').is(':visible')) {
       $('#mainMenu').hide()
+      return
+    }
+    if (window.visualViewport && window.visualViewport.scale !== 1) {
       return
     }
     const pageWidth = window.innerWidth || document.body.clientWidth
