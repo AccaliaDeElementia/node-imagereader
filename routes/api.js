@@ -9,28 +9,10 @@ const debug = require('debug')('picturereader:routes:pictures')
 const toSortKey = path => {
   const name = basename(path)
   const base = '0'.repeat(30)
-  return name.replace(/(\d+)/g, num => `${base}${num}`.slice(-30))
+  return name.toLowerCase().replace(/(\d+)/g, num => `${base}${num}`.slice(-30))
 }
 
-const naturalOrder = (list, keyExtractor = key => key, numberExtendTo = 20) => {
-  const base = '0'.repeat(numberExtendTo)
-  list.forEach(item => {
-    item.__key = `${keyExtractor(item)}`.replace(/(\d+)/g, num => `${base}${num}`.slice(-numberExtendTo))
-  })
-  list.sort((a, b) => {
-    if (a.__key < b.__key) {
-      return -1
-    } else if (a.__key > b.__key) {
-      return 1
-    }
-    return 0
-  })
-  list.forEach(item => {
-    delete item.__key
-  })
-  return list
-}
-
+// TODO: this really doesn't belong in api now does it?
 const synchronizeDb = async (db) => {
   const checkedAt = Date.now()
   debug('picture synchronization begins')
@@ -144,17 +126,14 @@ async function setLatest (db, path) {
 }
 
 async function getBookmarks (db) {
-  let bookmarks = await db('bookmarks').select(['id', 'path'])
+  let bookmarks = await db('bookmarks').select(['id', 'path', 'name']).orderBy('sortKey')
   bookmarks = bookmarks.map(bookmark => {
-    const folder = basename(dirname(bookmark.path))
-    const name = basename(bookmark.path, extname(bookmark.path))
     return {
       link: `/api/bookmarks/${bookmark.id}`,
       path: '/images' + bookmark.path,
-      name: `${folder} - ${name}`
+      name: bookmark.name
     }
   })
-  bookmarks = naturalOrder(bookmarks, i => i.name.toLowerCase())
   return bookmarks
 }
 
@@ -162,7 +141,9 @@ async function addBookmark (db, path) {
   path = path.replace(/^\/images/, '')
   const bookmark = await db('bookmarks').select('id').where({ path })[0]
   if (!bookmark) {
-    await db('bookmarks').insert({ path })
+    const name = `${basename(dirname(path))} - ${basename(path, extname(path))}`
+    const sortKey = toSortKey(name)
+    await db('bookmarks').insert({ path, name, sortKey })
   }
 }
 
