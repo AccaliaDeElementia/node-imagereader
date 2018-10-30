@@ -15,6 +15,10 @@ async function fsWalker (root, eachItem) {
       withFileTypes: true
     })
     for (let item of items) {
+      if (item.name[0] === '.') {
+        // skip hidden files
+        continue
+      }
       const path = join(current, item.name)
       if (item.isDirectory()) {
         queue.push(path)

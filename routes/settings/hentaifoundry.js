@@ -1,3 +1,5 @@
+'use sanity'
+
 const express = require('express')
 
 module.exports = db => {
@@ -6,7 +8,7 @@ module.exports = db => {
   router.get('/', async function (req, res) {
     const watchedusers = (await db.select(['hentaifoundrywatched.user', 'hentaifoundrywatched.active']).count('hentaifoundrysync.id as count').from('hentaifoundrywatched')
       .leftJoin('hentaifoundrysync', 'hentaifoundrywatched.user', 'hentaifoundrysync.user')
-      .groupBy('hentaifoundrywatched.user'))
+      .groupBy('hentaifoundrywatched.user', 'hentaifoundrywatched.active'))
       .sort((a, b) => b.count - a.count)
     res.render('options/hentaifoundry', { watchedusers })
   })

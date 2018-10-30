@@ -13,7 +13,7 @@ block centercontent
   div.mt-2.mb-2
     ul.list-group
       each watcher in watchedusers
-        if watcher.active === 1
+        if watcher.active 
           li.list-group-item(id=watcher.user)
             button.btn.btn-danger(type='button' data-name=watcher.user).deactivate-user Deactivate
             span.ml-3= watcher.user
@@ -21,7 +21,7 @@ block centercontent
   div.mt-2.mb-2
     ul.list-group
       each watcher in watchedusers
-        if watcher.active === 0
+        if !watcher.active
           li.list-group-item(id=watcher.user)
             button.btn.btn-success(type='button' data-name=watcher.user).activate-user Activate
             button.btn.btn-danger(type='button' data-name=watcher.user).delete-user.ml-3 Delete
