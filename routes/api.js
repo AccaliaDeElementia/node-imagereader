@@ -4,7 +4,7 @@ const config = require('../utils/config')
 const fswalker = require('../utils/fswalker')
 const { posix: { dirname, basename, extname, sep } } = require('path')
 
-const debug = require('debug')('picturereader:routes:pictures')
+const debug = require('debug')('imagereader:routes:pictures')
 
 const toSortKey = path => {
   const name = basename(path)

@@ -3,7 +3,7 @@
 const config = require('./config')
 const persistance = require('./persistance')
 
-const debug = require('debug')('picturereader:utils:hentaifoundry')
+const debug = require('debug')('imagereader:utils:hentaifoundry')
 
 const promisify = require('util').promisify
 const fse = require('fs-extra')

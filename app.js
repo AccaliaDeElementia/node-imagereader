@@ -1,6 +1,6 @@
 const config = require('./utils/config')
 
-const debug = require('debug')('picturereader:server')
+const debug = require('debug')('imagereader:server')
 const express = require('express')
 
 const persistance = require('./utils/persistance')
