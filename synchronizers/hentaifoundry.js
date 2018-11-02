@@ -1,9 +1,9 @@
-'use strict'
+'use sanity'
 
-const config = require('./config')
-const persistance = require('./persistance')
+const Synchronizer = require('./synchronizer')
 
-const debug = require('debug')('imagereader:utils:hentaifoundry')
+const config = require('../utils/config')
+const { delay } = require('../utils/utils')
 
 const promisify = require('util').promisify
 const fse = require('fs-extra')
@@ -13,13 +13,6 @@ const cheerio = require('cheerio')
 
 const domain = 'https://www.hentai-foundry.com'
 const folderPrefix = 'hentaifoundry'
-const root = config.imageRoot
-
-async function delay (milliseconds = 100) {
-  await new Promise((resolve) => {
-    setTimeout(resolve, milliseconds / 2 + Math.random() * milliseconds)
-  })
-}
 
 async function login (request) {
   let req = await request(`${domain}/?enterAgree=1`)
@@ -81,7 +74,7 @@ const getUserPage = async ({ fetch, user, pageNumber = 1, section = '' }) => {
   return { pictures, hasNext, totalPictures }
 }
 
-const downloadSection = async ({ fetch, download, user, section = '', db, pageLimit = Infinity }) => {
+const downloadSection = async ({ fetch, download, user, section = '', db, pageLimit = Infinity, logger }) => {
   let pageNumber = 1
   let count = 0
   const idList = await db.select('id').from('hentaifoundrysync').where({ user })
@@ -92,7 +85,7 @@ const downloadSection = async ({ fetch, download, user, section = '', db, pageLi
   while (pageNumber <= pageLimit) {
     const page = await getUserPage({ fetch, user, section, pageNumber })
     count += page.pictures.length
-    debug(`${user} ${section || 'pictures'} - Page ${pageNumber} - Images ${count}/${page.totalPictures}`)
+    logger(`${user} ${section || 'pictures'} - Page ${pageNumber} - Images ${count}/${page.totalPictures}`)
     for (let picture of page.pictures) {
       const id = +(/^\/(?:[^/]+\/){3}([^/]+)\/(.*)$/.exec(picture)[1])
       if (idMap[id]) {
@@ -101,7 +94,7 @@ const downloadSection = async ({ fetch, download, user, section = '', db, pageLi
       const result = await fetch(`${domain}${picture}`)
       const $ = cheerio.load(result.body)
       const title = $('.boxheader .imageTitle').text().replace(/[/?<>\\:*|"^]/g, '-')
-      debug(`${id} - ${title}`)
+      logger(`${id} - ${title}`)
       const link = `https:${$('.boxbody img').attr('src')}`
       const ext = (/[.]([^.]+)$/.exec(link) || [null, 'jpg'])[1]
       const dest = join(user, `${title} - ${id}.${ext}`)
@@ -116,11 +109,13 @@ const downloadSection = async ({ fetch, download, user, section = '', db, pageLi
   }
 }
 
-exports.sync = async () => {
+const runSync = async (db, logger) => {
+  const now = Date.now()
   if (!config.readValue('HENTAIFOUNDRY_USERNAME') || !config.readValue('HENTAIFOUNDRY_USERNAME')) {
-    debug('No login credentials! Aborting!')
+    logger('No login credentials! Aborting!')
     return
   }
+  logger('hentaifoundry synchronization begins')
   const rawrequest = require('request').defaults({
     jar: require('request').jar()
   })
@@ -130,7 +125,7 @@ exports.sync = async () => {
     return result
   })
   const download = async (uri, dest) => {
-    dest = join(root, folderPrefix, dest)
+    dest = join(config.imageRoot, folderPrefix, dest)
     await fse.mkdirp(dirname(dest))
     return new Promise((resolve, reject) => {
       const stream = fse.createWriteStream(dest)
@@ -140,11 +135,19 @@ exports.sync = async () => {
     })
   }
   await login(fetch)
-  const db = await persistance.initialize
   const watchers = (await db.select().from('hentaifoundrywatched').where({ active: 1 })).map(u => u.user)
   for (let user of watchers) {
-    await downloadSection({ fetch, download, user, db })
-    await downloadSection({ fetch, download, user, section: 'scraps', db })
+    await downloadSection({ fetch, download, user, db, logger })
+    await downloadSection({ fetch, download, user, section: 'scraps', db, logger })
   }
-  return watchers
+  logger(`hentaifoundry synchronization complete after ${(Date.now() - now) / 1000}s`)
 }
+
+module.exports = new Synchronizer({
+  name: 'Sync Hentaifoundry',
+  description: 'Fetch new images from watched artists at Hentaifoundry',
+  executor: runSync,
+  runImmediately: false,
+  runInterval: 24 * 60 * 60 * 1000,
+  useJitter: true
+})

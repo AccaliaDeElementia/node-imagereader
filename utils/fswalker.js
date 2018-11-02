@@ -1,9 +1,11 @@
 'use sanity'
 
 const fse = require('fs-extra')
-const join = require('path').join
+const { posix: { join, extname } } = require('path')
 
-async function fsWalker (root, eachItem) {
+const defaultExtensions = ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.svg', '.tif', '.tiff', '.bmp', '.jpe']
+
+async function fsWalker (root, eachItem, extensions = defaultExtensions) {
   const queue = ['/']
   if (!eachItem) {
     eachItem = () => Promise.resolve()
@@ -14,19 +16,17 @@ async function fsWalker (root, eachItem) {
       encoding: 'utf8',
       withFileTypes: true
     })
-    for (let item of items) {
-      if (item.name[0] === '.') {
-        // skip hidden files
-        continue
-      }
-      const path = join(current, item.name)
-      if (item.isDirectory()) {
-        queue.push(path)
-        await eachItem({ path, isFile: false })
-      } else {
-        await eachItem({ path, isFile: true })
-      }
-    }
+    await eachItem(items
+      .filter(item => item.isDirectory()
+        ? item.name[0] !== '.'
+        : extensions.length === 0 || extensions.indexOf(extname(item.name).toLowerCase()) >= 0)
+      .map(item => {
+        const path = join(current, item.name)
+        if (item.isDirectory()) {
+          queue.push(path)
+        }
+        return { path, isFile: !item.isDirectory() }
+      }), queue.length)
   }
 }
 

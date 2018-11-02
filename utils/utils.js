@@ -5,6 +5,12 @@ async function delay (milliseconds = 100) {
   })
 }
 
+const toSortKey = name => {
+  const base = '0'.repeat(30)
+  return name.toLowerCase().replace(/(\d+)/g, num => `${base}${num}`.slice(-30))
+}
+
 module.exports = {
-  delay
+  delay,
+  toSortKey
 }

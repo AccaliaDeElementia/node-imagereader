@@ -43,7 +43,6 @@ async function createRouters (app) {
   app.use('/', indexRouter)
   app.use('/api', apiRouter)
   app.use('/settings', settingsRouter)
-
   return app
 }
 
@@ -89,41 +88,6 @@ async function startServer (app) {
   server.listen(config.port)
 }
 
-const oneHour = 60 * 60 * 1000
-const oneDay = 24 * oneHour
-
-const synchronizers = [{
-  runner: (db) => hentaifoundry.sync(),
-  baseTime: oneDay,
-  scheduled: Date.now() + (Math.random() - 0.5) * oneDay,
-  running: false
-}, {
-  runner: (db) => api.api.synchronizeDb(db),
-  baseTime: oneHour,
-  scheduled: 0,
-  running: false
-}]
-
-function runTick (db) {
-  const now = Date.now()
-  synchronizers
-    .filter(sync => !sync.running && sync.scheduled < now)
-    .forEach(async sync => {
-      sync.running = true
-      await sync.runner(db)
-      sync.running = false
-      sync.scheduled = Date.now() + sync.baseTime + (Math.random() - 0.5) * sync.baseTime
-    })
-}
-
-const hentaifoundry = require('./utils/hentaifoundry')
-async function runSynchronizers () {
-  const db = await persistance.initialize
-  setInterval(() => runTick(db), 60 * 1000)
-  runTick(db)
-}
-
 setupMiddleware()
   .then(createRouters)
   .then(startServer)
-  .then(runSynchronizers())

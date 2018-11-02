@@ -1,56 +1,8 @@
 const express = require('express')
 
-const config = require('../utils/config')
-const fswalker = require('../utils/fswalker')
 const { posix: { dirname, basename, extname, sep } } = require('path')
 
-const debug = require('debug')('imagereader:routes:pictures')
-
-const toSortKey = path => {
-  const name = basename(path)
-  const base = '0'.repeat(30)
-  return name.toLowerCase().replace(/(\d+)/g, num => `${base}${num}`.slice(-30))
-}
-
-// TODO: this really doesn't belong in api now does it?
-const synchronizeDb = async (db) => {
-  const checkedAt = Date.now()
-  debug('picture synchronization begins')
-  let count = 0
-  let dirs = 0
-  let files = 0
-  await fswalker(config.imageRoot, async ({ path, isFile }) => {
-    try {
-      count++
-      if (isFile) {
-        files++
-      } else {
-        dirs++
-      }
-      if (!isFile && path[path.length - 1] !== sep) {
-        path += sep
-      }
-      let folder = dirname(path)
-      if (folder[folder.length - 1] !== sep) {
-        folder += sep
-      }
-      const dest = isFile ? 'pictures' : 'folders'
-      const sortKey = toSortKey(path)
-      const result = await db(dest).update({ checkedAt, sortKey }).where({ path })
-      if (result === 0) {
-        await db(dest).insert({ checkedAt, path, folder, sortKey })
-      }
-      if (count % 20 === 0) {
-        debug(`Found ${dirs} dirs and ${files} files`)
-      }
-    } catch (e) {
-      console.error(e, e.stacktrace)
-    }
-  })
-  await db('pictures').delete().whereNot({ checkedAt })
-  await db('folders').delete().whereNot({ checkedAt })
-  debug('picture synchronization complete')
-}
+const { toSortKey } = require('../utils/utils')
 
 async function listing (db, folder, recurse = true) {
   if (folder[folder.length - 1] !== sep) {
@@ -74,6 +26,7 @@ async function listing (db, folder, recurse = true) {
       this.on('folderInfos.firstImage', '=', 'pictures.sortKey')
         .andOn('folderInfos.folder', '=', 'pictures.folder')
     })
+  console.log(folderInfos)
   const getFolder = async path => {
     const folderInfo = (await db('folders').select(['path', 'current']).where({ path }))[0] || {}
     const counts = folderInfos
@@ -190,4 +143,4 @@ module.exports = (db) => {
   return router
 }
 
-module.exports.api = { listing, getBookmarks, synchronizeDb }
+module.exports.api = { listing, getBookmarks }
