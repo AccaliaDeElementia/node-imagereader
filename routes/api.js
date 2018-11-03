@@ -66,7 +66,7 @@ async function listing (db, folder, recurse = true) {
     picture.name = basename(picture.path, extname(picture.path))
     picture.path = '/images' + picture.path
   })
-  result.folders = folders
+  result.folders = folders.filter(f => f.imageCount > 0)
   result.pictures = pictures
   return result
 }
