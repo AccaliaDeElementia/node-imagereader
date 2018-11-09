@@ -38,6 +38,7 @@ if (!picturereaderdata.pictures.length) {
 
   const loadImage = () => {
     const pic = picturereaderdata.pictures[imageIdx]
+    pic.seen = true
     $('title').text(picturereaderdata.name)
     $('nav .title').text(picturereaderdata.name)
     $('.status-bar .center').text(pic.name)
@@ -77,6 +78,38 @@ if (!picturereaderdata.pictures.length) {
     lastImage: () => {
       imageIdx = picturereaderdata.pictures.length - 1
       loadImage()
+    },
+    nextFolder: () => {
+      if (picturereaderdata.nextFolder) {
+        window.location = picturereaderdata.nextFolder
+      }
+    },
+    previousFolder: () => {
+      if (picturereaderdata.previousFolder) {
+        window.location = picturereaderdata.previousFolder
+      }
+    },
+    previousUnseen: () => {
+      let idx = imageIdx
+      while (idx > 0) {
+        idx--
+        if (!picturereaderdata.pictures[idx].seen) {
+          imageIdx = idx
+          loadImage()
+          break
+        }
+      }
+    },
+    nextUnseen: () => {
+      let idx = imageIdx
+      while (idx < picturereaderdata.pictures.length - 1) {
+        idx++
+        if (!picturereaderdata.pictures[idx].seen) {
+          imageIdx = idx
+          loadImage()
+          break
+        }
+      }
     }
   }
   document.onkeyup = (evt) => {
@@ -104,6 +137,11 @@ if (!picturereaderdata.pictures.length) {
   $('.action-block .action-next').click(navigation.nextImage)
   $('.action-block .action-last').click(navigation.lastImage)
 
+  $('.action-block .action-nextfolder').click(navigation.nextFolder)
+  $('.action-block .action-previousfolder').click(navigation.previousFolder)
+  $('.action-block .action-nextunseen').click(navigation.nextUnseen)
+  $('.action-block .action-previousunseen').click(navigation.previousUnseen)
+
   const limit = Math.tan(45 * 1.5 / 180 * Math.PI)
 
   let pendingTouch = null
@@ -114,6 +152,7 @@ if (!picturereaderdata.pictures.length) {
   }).on('touchend', event => {
     const touch = event.originalEvent.changedTouches[0]
     if (pendingTouch && pendingTouch.identifier === touch.identifier) {
+      console.log(window.visualViewport.scale, initialScale, pendingTouch, touch)
       if (!window.visualViewport || window.visualViewport.scale <= initialScale) {
         handleGesture(pendingTouch, touch)
       }
@@ -138,7 +177,7 @@ if (!picturereaderdata.pictures.length) {
     }
   })
 
-  const initialScale = window.visualViewport ? window.visualViewport : 1
+  const initialScale = window.visualViewport ? window.visualViewport.scale : 1
 
   const handleGesture = (startTouch, endTouch) => {
     const pageWidth = window.innerWidth || document.body.clientWidth

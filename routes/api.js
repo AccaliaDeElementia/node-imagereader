@@ -26,7 +26,18 @@ async function listing (db, folder, recurse = true) {
       this.on('folderInfos.firstImage', '=', 'pictures.sortKey')
         .andOn('folderInfos.folder', '=', 'pictures.folder')
     })
-  console.log(folderInfos)
+  const previousFolder = ((await db('folders')
+    .limit(1)
+    .select('path')
+    .where({ folder: dirname(folder) + sep })
+    .andWhere('sortKey', '<', toSortKey(basename(folder)))
+    .orderBy('sortKey', 'desc'))[0] || {}).path
+  const nextFolder = ((await db('folders')
+    .limit(1)
+    .select('path')
+    .where({ folder: dirname(folder) + sep })
+    .andWhere('sortKey', '>', toSortKey(basename(folder)))
+    .orderBy('sortKey', 'asc'))[0] || {}).path
   const getFolder = async path => {
     const folderInfo = (await db('folders').select(['path', 'current']).where({ path }))[0] || {}
     const counts = folderInfos
@@ -55,6 +66,8 @@ async function listing (db, folder, recurse = true) {
     }
   }
   const result = await (getFolder(folder))
+  result.previousFolder = previousFolder ? '/show' + previousFolder : null
+  result.nextFolder = nextFolder ? '/show' + nextFolder : null
   let folders = []
   if (recurse) {
     for (let dir of await db('folders').select(['path', 'current']).where({ folder }).orderBy('sortKey')) {

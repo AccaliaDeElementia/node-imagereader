@@ -22,7 +22,8 @@ block content
     img(src=data.current style='display: none;')
   div.container.bg-light#mainMenu(style='display: none;')
     - hasPictures = data.pictures.length > 0 ? 'has-pictures' : 'no-pictures'
-    div(class=`d-flex justify-content-center action-block ${hasPictures}`)
+    div(class=`action-block ${hasPictures}`)
+      div.d-flex.justify-content-center 
         - 
           const actions = [{
             name: 'First',
@@ -48,16 +49,37 @@ block content
             div.card-img-top !{action.image}
             div.card-body
               h5.card-title.text-center= action.name
+      div.d-flex.justify-content-center
+        - 
+          const otheractions = [{
+            name: 'Previous Folder',
+            image: '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><path d="M0 0v6h2v-6h-2zm2 3l5 3v-6l-5 3z" transform="translate(0 1)" /></svg>'
+          }, {
+            name: 'Previous Unseen',
+            image: '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><path d="M4 0l-4 3 4 3v-6zm0 3l4 3v-6l-4 3z" transform="translate(0 1)" /></svg>'
+          }, {
+            name: 'Next Unseen',
+            image: '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><path d="M0 0v6l4-3-4-3zm4 3v3l4-3-4-3v3z" transform="translate(0 1)" /></svg>'
+          }, {
+            name: 'Next Folder',
+            image: '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><path d="M0 0v6l5-3-5-3zm5 3v3h2v-6h-2v3z" transform="translate(0 1)" /></svg>'
+          }]
+        each action in otheractions  
+          div(class=`card d-inline-block m-2 action-${action.name.replace(/\s+/, '').toLowerCase()}`)
+            div.card-img-top !{action.image}
+            div.card-body
+              h5.card-title.text-center= action.name
+      div
+        ul.nav.nav-tabs(role="tablist")
+          li.nav-item
+            a.nav-link.active#folders-tab(data-toggle="tab" href="#folders" role="tab") Folders
+          li.nav-item
+            a.nav-link#pictures-tab(data-toggle="tab" href="#pictures" role="tab") Pictures
+          li.nav-item
+            a.nav-link#bookmarks-tab(data-toggle="tab" href="#bookmarks" role="tab") Bookmarks
+          li.nav-item
+            a.nav-link#settings-tab(href="/settings" role="tab") Settings
     div(class=`menu-block ${hasPictures}`)
-      ul.nav.nav-tabs(role="tablist")
-        li.nav-item
-          a.nav-link.active#folders-tab(data-toggle="tab" href="#folders" role="tab") Folders
-        li.nav-item
-          a.nav-link#pictures-tab(data-toggle="tab" href="#pictures" role="tab") Pictures
-        li.nav-item
-          a.nav-link#bookmarks-tab(data-toggle="tab" href="#bookmarks" role="tab") Bookmarks
-        li.nav-item
-          a.nav-link#settings-tab(href="/settings" role="tab") Settings
       div.tab-content
         div.tab-pane.active#folders(role="tabpanel")
           h3 Folders
