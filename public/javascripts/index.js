@@ -114,7 +114,7 @@ if (!picturereaderdata.pictures.length) {
   }).on('touchend', event => {
     const touch = event.originalEvent.changedTouches[0]
     if (pendingTouch && pendingTouch.identifier === touch.identifier) {
-      if (!window.visualViewport || window.visualViewport.scale === 1) {
+      if (!window.visualViewport || window.visualViewport.scale <= initialScale) {
         handleGesture(pendingTouch, touch)
       }
       pendingTouch = null
@@ -124,7 +124,7 @@ if (!picturereaderdata.pictures.length) {
       $('#mainMenu').hide()
       return
     }
-    if (window.visualViewport && window.visualViewport.scale !== 1) {
+    if (window.visualViewport && window.visualViewport.scale > initialScale) {
       return
     }
     const pageWidth = window.innerWidth || document.body.clientWidth
@@ -137,6 +137,8 @@ if (!picturereaderdata.pictures.length) {
       navigation.nextImage()
     }
   })
+
+  const initialScale = window.visualViewport ? window.visualViewport : 1
 
   const handleGesture = (startTouch, endTouch) => {
     const pageWidth = window.innerWidth || document.body.clientWidth
