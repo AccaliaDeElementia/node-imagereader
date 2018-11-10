@@ -36,6 +36,12 @@ if (!picturereaderdata.pictures.length) {
     }
   })
 
+  const nope = () => {
+    $('.navbar').addClass('ease').removeClass('bg-light').addClass('bg-danger')
+    setTimeout(() => $('.navbar').addClass('bg-light'), 500)
+    setTimeout(() => $('.navbar').removeClass('ease').removeClass('bg-danger'), 1000)
+  }
+
   const loadImage = () => {
     const pic = picturereaderdata.pictures[imageIdx]
     pic.seen = true
@@ -62,8 +68,10 @@ if (!picturereaderdata.pictures.length) {
     nextImage: () => {
       if (imageIdx < picturereaderdata.pictures.length - 1) {
         imageIdx++
+        loadImage()
+      } else {
+        nope()
       }
-      loadImage()
     },
     randomImage: () => {
       imageIdx = Math.floor(Math.random() * picturereaderdata.pictures.length)
@@ -72,8 +80,10 @@ if (!picturereaderdata.pictures.length) {
     prevImage: () => {
       if (imageIdx > 0) {
         imageIdx--
+        loadImage()
+      } else {
+        nope()
       }
-      loadImage()
     },
     lastImage: () => {
       imageIdx = picturereaderdata.pictures.length - 1
@@ -82,11 +92,15 @@ if (!picturereaderdata.pictures.length) {
     nextFolder: () => {
       if (picturereaderdata.nextFolder) {
         window.location = picturereaderdata.nextFolder
+      } else {
+        nope()
       }
     },
     previousFolder: () => {
       if (picturereaderdata.previousFolder) {
         window.location = picturereaderdata.previousFolder
+      } else {
+        nope()
       }
     },
     previousUnseen: () => {
@@ -96,9 +110,10 @@ if (!picturereaderdata.pictures.length) {
         if (!picturereaderdata.pictures[idx].seen) {
           imageIdx = idx
           loadImage()
-          break
+          return
         }
       }
+      nope()
     },
     nextUnseen: () => {
       let idx = imageIdx
@@ -107,9 +122,10 @@ if (!picturereaderdata.pictures.length) {
         if (!picturereaderdata.pictures[idx].seen) {
           imageIdx = idx
           loadImage()
-          break
+          return
         }
       }
+      nope()
     }
   }
   document.onkeyup = (evt) => {
