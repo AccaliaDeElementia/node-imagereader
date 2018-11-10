@@ -27,46 +27,51 @@ block content
         - 
           const actions = [{
             name: 'First',
-            image: '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><path d="M0 0v6h2v-6h-2zm2 3l5 3v-6l-5 3z" transform="translate(0 1)" /></svg>'
+            image: 'skip_previous'
           }, {
             name: 'Previous',
-            image: '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><path d="M4 0l-4 3 4 3v-6zm0 3l4 3v-6l-4 3z" transform="translate(0 1)" /></svg>'
+            image: 'fast_rewind'
           }, {
             name: 'Random',
-            image: '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><path d="M6 0v1h-.5c-.35 0-.56.1-.78.38l-1.41 1.78-1.53-1.78c-.22-.26-.44-.38-.78-.38h-1v1h1c-.05 0 .01.04.03.03l1.63 1.91-1.66 2.06h-1v1h1c.35 0 .56-.1.78-.38l1.53-1.91 1.66 1.91c.22.26.44.38.78.38h.25v1l2-1.5-2-1.5v1h-.22c-.01-.01-.05-.04-.06-.03l-1.75-2.06 1.53-1.91h.5v1l2-1.5-2-1.5z" /></svg>'
+            image: 'shuffle'
           }, {
             name: 'Bookmark',
-            image: '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><path d="M0 0v8l2-2 2 2v-8h-4z" transform="translate(2)" /></svg>'
+            image: 'bookmarks'
           }, {
             name: 'Next',
-            image: '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><path d="M0 0v6l4-3-4-3zm4 3v3l4-3-4-3v3z" transform="translate(0 1)" /></svg>'
+            image: 'fast_forward'
           }, {
             name: 'Last',
-            image: '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><path d="M0 0v6l5-3-5-3zm5 3v3h2v-6h-2v3z" transform="translate(0 1)" /></svg>'
+            image: 'skip_next'
           }]
         each action in actions  
           div(class=`card d-inline-block m-2 action-${action.name.toLowerCase()}`)
-            div.card-img-top !{action.image}
+            div.card-img-top
+              i.material-icons= action.image
             div.card-body
               h5.card-title.text-center= action.name
       div.d-flex.justify-content-center
         - 
           const otheractions = [{
             name: 'Previous Folder',
-            image: '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><path d="M0 0v6h2v-6h-2zm2 3l5 3v-6l-5 3z" transform="translate(0 1)" /></svg>'
+            image: 'skip_previous'
           }, {
             name: 'Previous Unseen',
-            image: '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><path d="M4 0l-4 3 4 3v-6zm0 3l4 3v-6l-4 3z" transform="translate(0 1)" /></svg>'
+            image: 'fast_rewind'
+          }, {
+            name: 'Fullscreen',
+            image: 'fullscreen'
           }, {
             name: 'Next Unseen',
-            image: '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><path d="M0 0v6l4-3-4-3zm4 3v3l4-3-4-3v3z" transform="translate(0 1)" /></svg>'
+            image: 'fast_forward'
           }, {
             name: 'Next Folder',
-            image: '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><path d="M0 0v6l5-3-5-3zm5 3v3h2v-6h-2v3z" transform="translate(0 1)" /></svg>'
+            image: 'skip_next'
           }]
         each action in otheractions  
           div(class=`card d-inline-block m-2 action-${action.name.replace(/\s+/, '').toLowerCase()}`)
-            div.card-img-top !{action.image}
+            div.card-img-top
+              i.material-icons= action.image
             div.card-body
               h5.card-title.text-center= action.name
       div
@@ -87,7 +92,8 @@ block content
             if data.name !== ''
               div.card.d-inline-block.m-2
                 a(href=parentPath)
-                  div.card-img-top !{directoryImage}
+                  div.card-img-top
+                    i.material-icons folder
                 div.card-body
                   h5.card-title
                     a(href=parentPath) Parent
@@ -97,7 +103,8 @@ block content
                   if folder.current
                     img.card-img-top(src=encode(folder.current) alt=folder.name)
                   else
-                    div.card-img-top !{directoryImage}
+                    div.card-img-top
+                      i.material-icons folder
                 div.card-body
                   h5.card-title
                     a(href=encode(folder.path))= folder.name
@@ -112,7 +119,8 @@ block content
               div(class=`card d-inline-block m-2 ${cssclass}`, data-index=index)
                 div.card-body
                   h5.card-title
-                    span !{pictureImage}
+                    span 
+                      i.material-icons photo
                     span= picture.name
         div.tab-pane#bookmarks(role="tabpanel")
           h3 Bookmarks

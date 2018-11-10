@@ -126,6 +126,15 @@ if (!picturereaderdata.pictures.length) {
         }
       }
       nope()
+    },
+    fullscreen: () => {
+      if (!window.document.webkitFullscreenElement) {
+        window.document.body.webkitRequestFullscreen({
+          navigationUI: false
+        })
+      } else {
+        window.document.webkitExitFullscreen()
+      }
     }
   }
   document.onkeyup = (evt) => {
@@ -157,6 +166,7 @@ if (!picturereaderdata.pictures.length) {
   $('.action-block .action-previousfolder').click(navigation.previousFolder)
   $('.action-block .action-nextunseen').click(navigation.nextUnseen)
   $('.action-block .action-previousunseen').click(navigation.previousUnseen)
+  $('.action-block .action-fullscreen').click(navigation.fullscreen)
 
   const limit = Math.tan(45 * 1.5 / 180 * Math.PI)
 
