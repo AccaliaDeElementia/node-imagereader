@@ -159,7 +159,7 @@ const navigation = {
     }
   },
   parentfolder: () => {
-    window.location = picturereaderdata.parent
+    window.location = `/show${picturereaderdata.parent}`
   }
 }
 document.onkeyup = (evt) => {
