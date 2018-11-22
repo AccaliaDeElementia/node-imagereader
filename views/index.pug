@@ -2,10 +2,10 @@ extends layout
 
 
 block navigation
-  -const menuImage = '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><path d="M0 0v1h8v-1h-8zm0 2.97v1h8v-1h-8zm0 3v1h8v-1h-8z" transform="translate(0 1)" /></svg>'
   div.d-inline-block.mr-auto.ml-auto.title= data.name
   div.d-inline-block
-    button.btn#mainMenuItem !{menuImage}
+    button.btn#mainMenuItem
+      i.material-icons menu
 
 block content
   -
@@ -13,8 +13,6 @@ block content
       const mapper = str => encodeURIComponent(str).replace(/#/g, '%35')
       return path.split('/').map(mapper).join('/')
     }
-    const directoryImage = '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><path d="M0 0v2h8v-1h-5v-1h-3zm0 3v4.5c0 .28.22.5.5.5h7c.28 0 .5-.22.5-.5v-4.5h-8z" /></svg>'
-    const pictureImage = '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><path d="M0 0v8h8v-8h-8zm1 1h6v3l-1-1-1 1 2 2v1h-1l-4-4-1 1v-3z" /></svg>'
   script.
     const picturereaderdata = !{JSON.stringify(data)}
   - const parentPath = `/show${data.parent}`
@@ -22,71 +20,79 @@ block content
     img(src=data.current style='display: none;')
   div.container.bg-light#mainMenu(style='display: none;')
     - hasPictures = data.pictures.length > 0 ? 'has-pictures' : 'no-pictures'
-    div(class=`action-block ${hasPictures}`)
-      div.d-flex.justify-content-center 
-        - 
-          const actions = [{
-            name: 'First',
-            image: 'skip_previous'
-          }, {
-            name: 'Previous',
-            image: 'fast_rewind'
-          }, {
-            name: 'Random',
-            image: 'shuffle'
-          }, {
-            name: 'Bookmark',
-            image: 'bookmarks'
-          }, {
-            name: 'Next',
-            image: 'fast_forward'
-          }, {
-            name: 'Last',
-            image: 'skip_next'
-          }]
-        each action in actions  
-          div(class=`card d-inline-block m-2 action-${action.name.toLowerCase()}`)
-            div.card-img-top
-              i.material-icons= action.image
-            div.card-body
-              h5.card-title.text-center= action.name
-      div.d-flex.justify-content-center
-        - 
-          const otheractions = [{
-            name: 'Previous Folder',
-            image: 'skip_previous'
-          }, {
-            name: 'Previous Unseen',
-            image: 'fast_rewind'
-          }, {
-            name: 'Fullscreen',
-            image: 'fullscreen'
-          }, {
-            name: 'Next Unseen',
-            image: 'fast_forward'
-          }, {
-            name: 'Next Folder',
-            image: 'skip_next'
-          }]
-        each action in otheractions  
-          div(class=`card d-inline-block m-2 action-${action.name.replace(/\s+/, '').toLowerCase()}`)
-            div.card-img-top
-              i.material-icons= action.image
-            div.card-body
-              h5.card-title.text-center= action.name
-      div
-        ul.nav.nav-tabs(role="tablist")
-          li.nav-item
-            a.nav-link.active#folders-tab(data-toggle="tab" href="#folders" role="tab") Folders
-          li.nav-item
-            a.nav-link#pictures-tab(data-toggle="tab" href="#pictures" role="tab") Pictures
-          li.nav-item
-            a.nav-link#bookmarks-tab(data-toggle="tab" href="#bookmarks" role="tab") Bookmarks
-          li.nav-item
-            a.nav-link#settings-tab(href="/settings" role="tab") Settings
-    div(class=`menu-block ${hasPictures}`)
+    div
+      ul.nav.nav-tabs(role="tablist")
+        li.nav-item
+          a.nav-link.active#actions-tab(data-toggle="tab" href="#actions" role="tab") Actions
+        li.nav-item
+          a.nav-link#folders-tab(data-toggle="tab" href="#folders" role="tab") Folders
+        li.nav-item
+          a.nav-link#pictures-tab(data-toggle="tab" href="#pictures" role="tab") Pictures
+        li.nav-item
+          a.nav-link#bookmarks-tab(data-toggle="tab" href="#bookmarks" role="tab") Bookmarks
+        li.nav-item
+          a.nav-link#settings-tab(href="/settings" role="tab") Settings
+    div.menu-block
       div.tab-content
-        div.tab-pane.active#folders(role="tabpanel")
+        div.tab-pane.active.action-block#actions(role="tabpanel")
+          - 
+            const actionRows = [
+              [
+                {
+                  name: 'First',
+                  image: 'skip_previous'
+                }, {
+                  name: 'Previous',
+                  image: 'fast_rewind'
+                }, {
+                  name: 'Random',
+                  image: 'shuffle'
+                }, {
+                  name: 'Bookmark',
+                  image: 'bookmarks'
+                }, {
+                  name: 'Next',
+                  image: 'fast_forward'
+                }, {
+                  name: 'Last',
+                  image: 'skip_next'
+                }
+              ], [
+                {
+                  name: 'Previous Folder',
+                  image: 'first_page'
+                }, {
+                  name: 'Previous Unseen',
+                  image: 'chevron_left'
+                }, {
+                  name: 'Next Unseen',
+                  image: 'chevron_right'
+                }, {
+                  name: 'Next Folder',
+                  image: 'last_page'
+                }
+              ], [
+                {
+                  name: 'Mark All Seen',
+                  image: 'check_box'
+                }, {
+                  name: 'Fullscreen',
+                  image: 'fullscreen'
+                }, {
+                  name: 'Mark All Unseen',
+                  image: 'check_box_outline_blank'
+                }
+              ]
+            ]
+          each actionRow in actionRows
+            div.d-flex.justify-content-center 
+              each action in actionRow
+                div(class=`card d-inline-block m-2 action-${action.name.replace(/\s+/g, '').toLowerCase()}`)
+                  div.card-img-top
+                    i.material-icons= action.image
+                  div.card-body
+                    h5.card-title.text-center= action.name
+        div.tab-pane#folders(role="tabpanel")
           h3 Folders
           div.d-fled.flex-wrap.justify-content-center.w-100
             if data.name !== ''
@@ -134,7 +140,7 @@ block content
                     a(href=bookmark.link)= bookmark.name
                 div.card-footer
                   button.remove.btn.btn-danger(type="button" aria-label="Remove") Remove Bookmark
-  div.fixed-bottom.text-center.status-bar.text-border
+    div.fixed-bottom.text-center.status-bar.text-border
     span.float-left.left  
     span.center 
     span.float-right.right 

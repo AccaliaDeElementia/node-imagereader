@@ -123,6 +123,12 @@ async function goToBookmark (db, id) {
   return '/show' + dirname(bookmark[0].path)
 }
 
+async function markRead (db, path, seenValue = true) {
+  path = path.replace(/^\/show/, '')
+  console.log(path)
+  await db('pictures').update({ seen: seenValue }).where('folder', 'like', `${path}%`)
+}
+
 module.exports = (db) => {
   const router = express.Router()
 
@@ -136,6 +142,14 @@ module.exports = (db) => {
   })
   router.post('/navigate/latest', async (req, res) => {
     await setLatest(db, req.body.path)
+    res.status(200).end()
+  })
+  router.post('/mark/read', async (req, res) => {
+    await markRead(db, req.body.path, true)
+    res.status(200).end()
+  })
+  router.post('/mark/unread', async (req, res) => {
+    await markRead(db, req.body.path, false)
     res.status(200).end()
   })
   router.get('/bookmarks', async (req, res) => {

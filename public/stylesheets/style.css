@@ -53,29 +53,8 @@ nav.ease {
   font-size: 12em; }
 
 #mainMenu {
-  position: absolute; }
-  #mainMenu .action-block.has-pictures {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 18rem; }
-  #mainMenu .menu-block.has-pictures {
-    overflow-y: scroll;
-    position: absolute;
-    top: 18rem;
-    left: 0;
-    right: 0;
-    bottom: 0; }
-  #mainMenu .action-block.no-pictures {
-    display: none !important; }
-  #mainMenu .menu-block.no-pictures {
-    overflow-y: scroll;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0; }
+  position: absolute;
+  overflow-y: scroll; }
   #mainMenu #folders .card {
     width: 15rem; }
     #mainMenu #folders .card .card-img-top {
