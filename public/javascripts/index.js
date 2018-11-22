@@ -157,6 +157,9 @@ const navigation = {
     } else {
       window.document.webkitExitFullscreen()
     }
+  },
+  parentfolder: () => {
+    window.location = picturereaderdata.parent
   }
 }
 document.onkeyup = (evt) => {
@@ -189,6 +192,7 @@ $('.action-block .action-previousfolder').click(navigation.previousFolder)
 $('.action-block .action-nextunseen').click(navigation.nextUnseen)
 $('.action-block .action-previousunseen').click(navigation.previousUnseen)
 $('.action-block .action-fullscreen').click(navigation.fullscreen)
+$('.action-block .action-parentfolder').click(navigation.parentfolder)
 $('.action-block .action-markallseen').click(navigation.markRead)
 $('.action-block .action-markallunseen').click(navigation.markUnRead)
 
