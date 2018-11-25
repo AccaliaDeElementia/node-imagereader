@@ -1,9 +1,11 @@
 
-async function delay (milliseconds = 100) {
+const delay = async (milliseconds = 100) => {
   await new Promise((resolve) => {
     setTimeout(resolve, milliseconds / 2 + Math.random() * milliseconds)
   })
 }
+
+const toFolderName = (title) => title.trim().replace(/[/?<>\\:*|"^]/g, '-').replace(/[.]$/, '')
 
 const toSortKey = name => {
   const base = '0'.repeat(30)
@@ -12,5 +14,6 @@ const toSortKey = name => {
 
 module.exports = {
   delay,
-  toSortKey
+  toSortKey,
+  toFolderName
 }

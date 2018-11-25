@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node ./app.js",
+    "test": "node ./test.js",
     "lint": "eslint .",
     "knex": "knex"
   },
@@ -20,7 +21,8 @@
     "pg": "^7.6.0",
     "pug": "2.0.0-beta11",
     "request": "^2.88.0",
-    "sqlite3": "^4.0.2"
+    "sqlite3": "^4.0.2",
+    "tough-cookie": "^2.4.3"
   },
   "devDependencies": {
     "eslint": "^5.7.0",
