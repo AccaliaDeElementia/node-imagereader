@@ -116,7 +116,7 @@ const runSync = async (db, logger) => {
   const now = Date.now()
   if (!config.readValue('HENTAIFOUNDRY_USERNAME') || !config.readValue('HENTAIFOUNDRY_PASSWORD')) {
     logger('No login credentials! Aborting!')
-    return
+    return false
   }
   logger('hentaifoundry synchronization begins')
   const browser = await new Browser(folderPrefix).prepare()
@@ -128,6 +128,7 @@ const runSync = async (db, logger) => {
     await downloadSection({ browser, user, section: 'scraps', db, logger })
   }
   logger(`hentaifoundry synchronization complete after ${(Date.now() - now) / 1000}s`)
+  return true
 }
 
 module.exports = new Synchronizer({
