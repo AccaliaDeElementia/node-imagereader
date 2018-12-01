@@ -5,7 +5,7 @@ const delay = async (milliseconds = 100) => {
   })
 }
 
-const toFolderName = (title) => title.trim().replace(/[/?<>\\:*|"^]/g, '-').replace(/[.]$/, '')
+const toFolderName = (title) => title.trim().replace(/[/?<>\\:*|"^]/g, '-').replace(/[.]$/, '').replace(/^[.]+/, '')
 
 const toSortKey = name => {
   const base = '0'.repeat(30)

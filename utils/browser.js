@@ -62,7 +62,7 @@ class Browser {
       const stream = fse.createWriteStream(dest)
       stream.on('error', reject)
       stream.on('finish', resolve)
-      this.rawrequest(uri).pipe(stream)
+      this.rawrequest(encodeURI(uri)).pipe(stream)
     })
     await fse.writeJSON(this.__cookieFile, await this.__serializeCookies())
     await delay(500)
