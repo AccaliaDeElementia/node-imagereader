@@ -108,7 +108,7 @@ block content
                     a(href=parentPath) Parent
             each folder in data.folders
               div.card.d-inline-block.m-2
-                a(href=encode(folder.path))
+                a(class=`${folder.seenCount === folder.imageCount ? 'text-success' : 'text-primary'}` href=encode(folder.path))
                   if folder.current
                     img.card-img-top(src=encode(folder.current) alt=folder.name)
                   else
@@ -116,17 +116,15 @@ block content
                       i.material-icons folder
                 div.card-body
                   h5.card-title
-                    a(href=encode(folder.path))= folder.name
+                    a(class=`${folder.seenCount === folder.imageCount ? 'text-success' : 'text-primary'}` href=encode(folder.path))= folder.name
                   div.progress
-                    - const width = `width: ${folder.percent}%`
                     - const text = `${folder.seenCount}/${folder.imageCount}`
-                    div.progress-bar(role="progressbar" style=width aria-valuenow=folder.percent aria-valuemin="0" aria-valuemax="100")= text
+                    div(class=`progress-bar ${folder.seenCount === folder.imageCount ? 'bg-success' : ''}` role="progressbar" style=`width: ${folder.percent}%` aria-valuenow=`${folder.percent}` aria-valuemin="0" aria-valuemax="100")= text
         div.tab-pane#pictures(role="tabpanel")
           h3 Pictures
           div.d-fled.flex-wrap.justify-content-center.w-100
             each picture, index in data.pictures
-              -const cssclass = picture.seen ? 'seen' : 'unseen' 
-              div(class=`card d-inline-block m-2 ${cssclass}`, data-index=index)
+              div(class=`card d-inline-block m-2 ${picture.seen ? 'text-success' : 'text-primary'}`, data-index=index)
                 div.card-body
                   h5.card-title
                     span 

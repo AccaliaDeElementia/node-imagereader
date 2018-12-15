@@ -51,12 +51,11 @@ const synchronizeDb = async (db, logger) => {
   const insertedpics = await db.from(db.raw('?? (??, ??, ??)', ['pictures', 'folder', 'path', 'sortKey']))
     .insert(function () {
       this.select(['syncitems.folder', 'syncitems.path', 'syncitems.sortKey']).from('syncitems')
-        .whereNotExists(function () {
-          this.select('*')
-            .from('pictures')
-            .whereRaw('syncitems.path = pictures.path')
+        .leftJoin('pictures', 'pictures.path', 'syncitems.path')
+        .andWhere({
+          'syncitems.isFile': true,
+          'pictures.path': null
         })
-        .andWhere({ 'syncitems.isFile': true })
     })
   logger(`Added ${insertedpics.rowCount} new pictures`)
   const deletedpics = await db('pictures').whereNotExists(function () {
@@ -66,18 +65,34 @@ const synchronizeDb = async (db, logger) => {
   const insertedfolders = await db.from(db.raw('?? (??, ??, ??)', ['folders', 'folder', 'path', 'sortKey']))
     .insert(function () {
       this.select(['syncitems.folder', 'syncitems.path', 'syncitems.sortKey']).from('syncitems')
-        .whereNotExists(function () {
-          this.select('*')
-            .from('folders')
-            .whereRaw('syncitems.path = folders.path')
+        .leftJoin('folders', 'folders.path', 'syncitems.path')
+        .andWhere({
+          'syncitems.isFile': false,
+          'folders.path': null
         })
-        .andWhere({ 'syncitems.isFile': false })
     })
   logger(`Added ${insertedfolders.rowCount} new folders`)
   const deletedfolders = await db('folders').whereNotExists(function () {
     this.select('*').from('syncitems').whereRaw('syncitems.path = folders.path')
   }).delete()
   logger(`Removed ${deletedfolders} old folders`)
+  const removedCoverImages = await db('folders')
+    .update({ current: '' })
+    .whereNotExists(function () {
+      this.select('*')
+        .from('pictures')
+        .whereRaw('pictures.path = folders.current')
+    })
+    .whereRaw('folders.current <> \'\'')
+  logger(`Removed ${removedCoverImages} missing cover images`)
+  const removedBookmarks = await db('bookmarks')
+    .whereNotExists(function () {
+      this.select('*')
+        .from('pictures')
+        .whereRaw('pictures.path = bookmarks.path')
+    })
+    .delete()
+  logger(`Removed ${removedBookmarks} missing bookmarks`)
   logger(`picture synchronization complete after ${(Date.now() - now) / 1000}s`)
 }
 
