@@ -1,5 +1,7 @@
 'use sanity'
 
+const logLimit = 1e3
+
 class Synchronizer {
   constructor ({
     name,
@@ -71,8 +73,8 @@ class Synchronizer {
       this.logger(line)
     }
     this.log.push(...lines)
-    if (this.log.length > 200) {
-      this.log = this.log.slice(-200)
+    if (this.log.length > logLimit) {
+      this.log = this.log.slice(-logLimit)
     }
   }
 

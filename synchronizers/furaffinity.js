@@ -49,10 +49,11 @@ const login = async () => {
 
 const fetchImage = async ({ browser, logger, user, prefix, id }) => {
   const $ = await browser.fetchCheerio(`${domain}/view/${id}`)
-  const imageUri = 'https:' + $('#submissionImg').data('fullview-src')
-  if (!imageUri) {
+  const imageSrc = $('#submissionImg').data('fullview-src')
+  if (!imageSrc) {
     return
   }
+  const imageUri = 'https:' + imageSrc
   const title = $('th.cat').text().trim()
   let extension = 'png'
   try {
