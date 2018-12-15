@@ -8,6 +8,6 @@ module.exports = db => {
   router.use('/hentaifoundry', watchedusers(db, 'hentaifoundry', 'Hentai Foundry - Watched Users'))
   router.use('/furaffinity', watchedusers(db, 'furaffinity', 'Fur Affinity [dot] net - Watched Users'))
   router.use('/syncs', syncs(db))
-  router.get('/', (req, res) => res.redirect('/settings/hentaifoundry'))
+  router.get('/', (req, res) => res.redirect('/settings/syncs'))
   return router
 }

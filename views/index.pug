@@ -119,7 +119,8 @@ block content
                     a(href=encode(folder.path))= folder.name
                   div.progress
                     - const width = `width: ${folder.percent}%`
-                    div.progress-bar(role="progressbar" style=width aria-valuenow=folder.percent aria-valuemin="0" aria-valuemax="100")= folder.imageCount
+                    - const text = `${folder.seenCount}/${folder.imageCount}`
+                    div.progress-bar(role="progressbar" style=width aria-valuenow=folder.percent aria-valuemin="0" aria-valuemax="100")= text
         div.tab-pane#pictures(role="tabpanel")
           h3 Pictures
           div.d-fled.flex-wrap.justify-content-center.w-100

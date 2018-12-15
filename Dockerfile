@@ -21,7 +21,7 @@ RUN /usr/local/bin/npm install
 
 EXPOSE 3000/tcp
 
-ENV PICREAD_DB_NAME /data/persistance.sqlite
+ENV PICREAD_DB_ENVIRONMENT production
 
 
 VOLUME /images

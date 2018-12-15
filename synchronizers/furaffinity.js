@@ -127,7 +127,7 @@ const runSync = async (db, logger) => {
   logger('Fur Affinity synchronization begins')
   const watchers = (await db.select().from('furaffinitywatched').where({ active: 1 })).map(u => u.user)
   for (let user of watchers) {
-    logger(``)
+    logger(`Fetching images for ${user}`)
     await fetchGalleries({ browser, user, db, logger })
   }
   logger(`Fur Affinity synchronization complete after ${(Date.now() - now) / 1000}s`)

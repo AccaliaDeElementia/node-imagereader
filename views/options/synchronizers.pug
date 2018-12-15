@@ -1,0 +1,19 @@
+extends layout
+
+block centercontent
+  h1= title
+  div.mt-2.mb-2
+    ul.list-group
+      each sync, idx in syncs
+        a(href=`/settings/syncs/${idx}`)
+          div.card
+            div.card-body
+              h5.card-title= sync.name
+              h6.card-subtitle.mb-2.text-muted= sync.description
+              form
+                a.btn.btn-primary(href=`/settings/syncs/${idx}`) Edit
+                div.d-inline.mx-2
+                button(class=`btn ${sync.isEnabled ? 'btn-success' : 'btn-danger'} disabled`)= (sync.isEnabled ? 'Enabled' : 'Disabled')
+                div.d-inline.mx-2
+                button(class=`btn btn-secondary disabled`)= (sync.runImmediately ? 'Runs On Startup' : 'Runs on Schedule')
+              

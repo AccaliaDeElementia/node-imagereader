@@ -1,0 +1,63 @@
+extends layout
+
+block centercontent
+  h1= title
+  h6
+    a(href='/settings/syncs') Back...
+  form(action='/settings/syncs/save' method='post')
+    input(type='hidden' name='id' value=index)
+    div.form-group
+      label(for='syncName') Name
+      input.form-control(type='text' id='syncName' name='syncName' readonly value=sync.name)
+    div.form-group
+      label(for='syncDescription') Description
+      textarea.form-control(id='syncDescription' name='syncDescription' rows=5)= sync.description
+    div.form-row
+      div.form-group.col-md-6
+        label(for='syncEnabled') Is Enabled
+        input.form-control(type='checkbox' id='syncEnabled' name='syncEnabled' checked=sync.isEnabled)
+      div.form-group.col-md-6
+        label(for='syncRunImmediately') Run At Startup
+        input.form-control(type='checkbox' id='syncRunImmediately' name='syncRunImmediately' checked=sync.runImmediately)
+    div.form-row
+      div.form-group.col-md-6
+        label(for='syncJitter') Use Jitter
+        input.form-control(type='checkbox' id='syncJitter' name='syncJitter' checked=sync.useJitter)
+      div.form-group.col-md-6
+        label(for='syncJitterFactor') Jitter Factor
+        div.input-group
+          div.input-group-prepend
+            button.btn.btn-outline-secondary.btnAutofillInput(type='button' data-update-target='#syncJitterFactor' data-value='10') 10%
+            button.btn.btn-outline-secondary.btnAutofillInput(type='button' data-update-target='#syncJitterFactor' data-value='33') 33%
+            button.btn.btn-outline-secondary.btnAutofillInput(type='button' data-update-target='#syncJitterFactor' data-value='50') 50%
+            button.btn.btn-outline-secondary.btnAutofillInput(type='button' data-update-target='#syncJitterFactor' data-value='66') 66%
+            button.btn.btn-outline-secondary.btnAutofillInput(type='button' data-update-target='#syncJitterFactor' data-value='100') 100%
+          input.form-control(type='number' style='text-align: right;' id='syncJitterFactor' name='syncJitterFactor' value=(100*sync.jitterFactor))
+          div.input-gtoup-append
+            span.input-group-text %
+    div.form-group
+      label(for='syncRunInterval') Run Interval
+      div.input-group
+        div.input-group-prepend
+          button.btn.btn-outline-secondary.btnAutofillInput(type='button' data-update-target='#syncRunInterval' data-value='60000') 1m
+          button.btn.btn-outline-secondary.btnAutofillInput(type='button' data-update-target='#syncRunInterval' data-value='1800000') 30m
+          button.btn.btn-outline-secondary.btnAutofillInput(type='button' data-update-target='#syncRunInterval' data-value='3600000') 1h
+          button.btn.btn-outline-secondary.btnAutofillInput(type='button' data-update-target='#syncRunInterval' data-value='21600000') 6h
+          button.btn.btn-outline-secondary.btnAutofillInput(type='button' data-update-target='#syncRunInterval' data-value='43200000') 12h
+          button.btn.btn-outline-secondary.btnAutofillInput(type='button' data-update-target='#syncRunInterval' data-value='86400000') 1d
+        input.form-control(type='number' style='text-align: right;' id='syncRunInterval' name='syncRunInterval' value=sync.runInterval)
+    div.form-group
+      input.btn.btn-primary(type='submit' value='Save')
+      div.d-inline.mx-2
+      a.btn.btn-secondary(href=`/settings/syncs/${index}?${Date.now()}`) Refresh
+      div.d-inline.mx-2
+      a.btn.btn-secondary(href=`/settings/syncs/${index}/run`) Run Now
+      
+  form
+    div.form-group
+      label(for='syncOutput') Output Tail
+      textarea.form-control(id='syncOutput' name='syncOutput' rows=25)= sync.log.join('\n')
+  script.
+    $('.btnAutofillInput').click(function () {
+      $($(this).data('update-target')).val($(this).data('value'));
+    });

@@ -7,6 +7,14 @@ const fswalker = require('../utils/fswalker')
 const { toSortKey } = require('../utils/utils')
 const Synchronizer = require('./synchronizer')
 
+const chunk = (arr, size = 200) => {
+  const res = []
+  for (let i = 0; i < arr.length; i += size) {
+    res.push(arr.slice(i, i + size))
+  }
+  return res
+}
+
 const synchronizeDb = async (db, logger) => {
   const now = Date.now()
   logger('picture synchronization begins')
@@ -15,23 +23,26 @@ const synchronizeDb = async (db, logger) => {
   await db('syncitems').delete()
   await fswalker(config.imageRoot, async (items, pending) => {
     try {
-      await db('syncitems').insert(items.map(item => {
-        if (item.isFile) {
-          files++
-        } else {
-          dirs++
-        }
-        let folder = dirname(item.path)
-        if (folder.length > 1) {
-          folder += sep
-        }
-        return {
-          folder: folder,
-          path: item.path + (!item.isFile ? sep : ''),
-          isFile: item.isFile,
-          sortKey: toSortKey(basename(item.path))
-        }
-      }))
+      const chunks = chunk(items)
+      for (let chunk of chunks) {
+        await db('syncitems').insert(chunk.map(item => {
+          if (item.isFile) {
+            files++
+          } else {
+            dirs++
+          }
+          let folder = dirname(item.path)
+          if (folder.length > 1) {
+            folder += sep
+          }
+          return {
+            folder: folder,
+            path: item.path + (!item.isFile ? sep : ''),
+            isFile: item.isFile,
+            sortKey: toSortKey(basename(item.path))
+          }
+        }))
+      }
       logger(`Found ${dirs} dirs (${pending} pending) and ${files} files`)
     } catch (e) {
       console.error(e, e.stack)

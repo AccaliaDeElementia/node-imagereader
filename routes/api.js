@@ -62,6 +62,7 @@ async function listing (db, folder, recurse = true) {
       parent: dirname(path + sep),
       percent: counts.totalSeen / counts.totalCount * 100,
       imageCount: counts.totalCount,
+      seenCount: counts.totalSeen,
       current: firstImage ? '/images' + firstImage : null
     }
   }
