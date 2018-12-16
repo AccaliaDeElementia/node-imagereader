@@ -80,7 +80,7 @@ const fetchGallery = async ({ db, browser, logger, user, prefix, uri, ids }) => 
     })
     for (let id of submissions) {
       await fetchImage({ browser, prefix, id, logger, user })
-      await db.insert({ id, user, fetched: true }).into('furaffinitysync')
+      await db.insert({ submission: id, user, fetched: true }).into('furaffinitysync')
       ids[id] = true
     }
     uri = $('.fancy-pagination .button-link.right').attr('href')
@@ -89,10 +89,10 @@ const fetchGallery = async ({ db, browser, logger, user, prefix, uri, ids }) => 
 }
 
 const fetchGalleries = async ({ db, logger, browser, user }) => {
-  const idList = await db.select('id').from('furaffinitysync').where({ user, fetched: true })
+  const idList = await db.select('submission').from('furaffinitysync').where({ user, fetched: true })
   const ids = {}
-  idList.forEach(({ id }) => {
-    ids[id] = true
+  idList.forEach(({ submission }) => {
+    ids[submission] = true
   })
   const mainGallery = `/gallery/${user}`
   const $ = await browser.fetchCheerio(domain + mainGallery)
