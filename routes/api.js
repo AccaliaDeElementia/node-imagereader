@@ -121,7 +121,8 @@ async function deleteBookmark (db, id) {
 async function goToBookmark (db, id) {
   const bookmark = await db('bookmarks').select('path').where({ id })
   await setLatest(db, bookmark[0].path)
-  return '/show' + dirname(bookmark[0].path)
+  const mapper = str => encodeURIComponent(str).replace(/#/g, '%35')
+  return ('/show' + dirname(bookmark[0].path)).split('/').map(mapper).join('/')
 }
 
 async function markRead (db, path, seenValue = true) {

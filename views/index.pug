@@ -136,7 +136,7 @@ block content
             each bookmark in bookmarks 
               div.card.d-inline-block.m-2(data-link=bookmark.link)
                 a(href=bookmark.link)
-                  img.card-img-top(src=bookmark.path alt=bookmark.name)
+                  img.card-img-top(src=encode(bookmark.path) alt=bookmark.name)
                 div.card-body
                   h5.card-title
                     a(href=bookmark.link)= bookmark.name

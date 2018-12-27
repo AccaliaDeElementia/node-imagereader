@@ -62,3 +62,15 @@ block centercontent
       $($(this).data('update-target')).val($(this).data('value'));
     });
     $('#syncOutput').scrollTop($('#syncOutput')[0].scrollHeight);
+    setInterval(function() {
+      $.ajax({
+        cache: false,
+        url: location.pathname + '/log',
+        success: (log) => { 
+          const target = $('#syncOutput');
+          target.val(log);
+          target.scrollTop(target[0].scrollHeight);
+        }
+      });
+      
+    }, 5000); 

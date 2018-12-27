@@ -11,14 +11,20 @@ const cheerio = require('cheerio')
 const domain = 'https://www.hentai-foundry.com'
 const folderPrefix = 'hentaifoundry'
 
-async function login (browser, logger) {
+async function checkLogin (browser, logger) {
   let req = await browser.fetch(`${domain}/?enterAgree=1`)
   let $ = cheerio.load(req.body)
   const welcomeMessage = $('#headerWelcome')
   if (welcomeMessage.length) {
     logger('Already Logged In')
-    return req
+    return true
   }
+  return false
+}
+
+async function login (browser, logger) {
+  let req = await browser.fetch(`${domain}/?enterAgree=1`)
+  let $ = cheerio.load(req.body)
   logger('Logging In')
   let nonce = $('input[name=YII_CSRF_TOKEN]').val()
   req = await browser.fetch({
@@ -114,14 +120,15 @@ const downloadSection = async ({ browser, user, section = '', db, pageLimit = In
 
 const runSync = async (db, logger) => {
   const now = Date.now()
-  if (!config.readValue('HENTAIFOUNDRY_USERNAME') || !config.readValue('HENTAIFOUNDRY_PASSWORD')) {
-    logger('No login credentials! Aborting!')
-    return false
+  const browser = await new Browser(folderPrefix).prepare()
+  if (!await checkLogin(browser, logger)) {
+    if (!config.readValue('HENTAIFOUNDRY_USERNAME') || !config.readValue('HENTAIFOUNDRY_PASSWORD')) {
+      logger('No login credentials! Cannot Auto Login!')
+      return false
+    }
+    await login(browser, logger)
   }
   logger('hentaifoundry synchronization begins')
-  const browser = await new Browser(folderPrefix).prepare()
-
-  await login(browser, logger)
   const watchers = (await db.select().from('hentaifoundrywatched').where({ active: 1 })).map(u => u.user)
   for (let user of watchers) {
     await downloadSection({ browser, user, db, logger })

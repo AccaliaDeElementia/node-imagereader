@@ -4,8 +4,6 @@ const Synchronizer = require('./synchronizer')
 
 const fse = require('fs-extra')
 
-const { toFolderName } = require('../utils/utils')
-
 const domain = 'https://www.furaffinity.net'
 const folderPrefix = 'furaffinity'
 
@@ -59,7 +57,7 @@ const fetchImage = async ({ browser, logger, user, prefix, id }) => {
   try {
     extension = /[.]([^.]+)$/.exec(imageUri)[1]
   } catch (e) { }
-  const filename = toFolderName(`${title} - ${id}.${extension}`)
+  const filename = `${title} - ${id}.${extension}`
   const dest = `${prefix}/${filename}`
   logger(`${user} - ${title}`)
   await browser.download(imageUri, dest)
@@ -98,13 +96,13 @@ const fetchGalleries = async ({ db, logger, browser, user }) => {
   const $ = await browser.fetchCheerio(domain + mainGallery)
   const folders = []
   $('.folder-list a').each((_, elem) => {
-    let name = toFolderName($(elem).text())
+    let name = $(elem).text()
     if (name === 'Scraps') {
       return
     }
     const parent = $(elem).closest('ul').prev()
     if (parent.is('h5')) {
-      name = `${toFolderName(parent.text())}/${name}`
+      name = `${parent.text()}/${name}`
     }
     folders.push([`${user}/${name}`, $(elem).attr('href')])
   })

@@ -2,6 +2,7 @@
 
 const config = require('./config')
 const { delay } = require('./utils')
+const { toFolderName } = require('../utils/utils')
 
 const promisify = require('util').promisify
 const fse = require('fs-extra')
@@ -56,7 +57,9 @@ class Browser {
   }
 
   async download (uri, dest) {
-    dest = join(config.imageRoot, this.folderPrefix, dest)
+    let reldest = join(this.folderPrefix, dest)
+    reldest = reldest.split('/').map(toFolderName).join('/')
+    dest = join(config.imageRoot, reldest)
     await fse.mkdirp(dirname(dest))
     await new Promise((resolve, reject) => {
       const stream = fse.createWriteStream(dest)

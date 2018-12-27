@@ -27,10 +27,18 @@ module.exports = db => {
   router.get('/:index(\\d+)', async (req, res) => {
     const sync = syncs[+req.params.index]
     if (!sync) {
-      return res.redirect('.')
+      return res.redirect('/settings/syncs')
     }
     const websync = sync.toWebData()
     res.render('options/synchronizer', { title: `Synchronizer: ${websync.name}`, index: +req.params.index, sync: websync })
+  })
+
+  router.get('/:index(\\d+)/log', async (req, res) => {
+    const sync = syncs[+req.params.index]
+    if (!sync) {
+      return res.redirect('/settings/syncs')
+    }
+    res.send(sync.log.join('\n')).end()
   })
 
   router.get('/:index(\\d+)/run', async (req, res) => {
