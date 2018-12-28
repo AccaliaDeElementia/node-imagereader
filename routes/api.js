@@ -99,7 +99,7 @@ async function listing (db, folder, recurse = true) {
 }
 
 async function setLatest (db, path) {
-  path = path.replace(/^\/images/, '')
+  path = decodeURI(path).replace(/^\/images/, '')
   const folder = dirname(path) + sep
   await db('folders').update({ current: path }).where({ path: folder })
   await db('pictures').update({ seen: true }).where({ path })
