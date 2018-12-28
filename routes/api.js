@@ -69,8 +69,8 @@ async function listing (db, folder, recurse = true) {
     }
   }
   const result = await (getFolder(folder))
-  result.previousFolder = previousFolder ? '/show' + previousFolder : null
-  result.nextFolder = nextFolder ? '/show' + nextFolder : null
+  result.previousFolder = previousFolder ? toURI('/show' + previousFolder) : null
+  result.nextFolder = nextFolder ? toURI('/show' + nextFolder) : null
   let folders = {
     complete: [],
     incomplete: []
