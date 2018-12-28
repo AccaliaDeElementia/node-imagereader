@@ -4,6 +4,8 @@ const { posix: { dirname, basename, extname, sep } } = require('path')
 
 const { toSortKey } = require('../utils/utils')
 
+const toURI = uri => uri.split('/').map(str => encodeURIComponent(str).replace(/#/g, '%35')).join('/')
+
 async function listing (db, folder, recurse = true) {
   if (folder[folder.length - 1] !== sep) {
     folder += sep
@@ -57,30 +59,41 @@ async function listing (db, folder, recurse = true) {
       })
     const firstImage = folderInfo.current ? folderInfo.current : counts.firstImage
     return {
-      path: '/show' + path,
+      path: toURI('/show' + path),
       name: basename(path),
       parent: dirname(path + sep),
       percent: counts.totalSeen / counts.totalCount * 100,
       imageCount: counts.totalCount,
       seenCount: counts.totalSeen,
-      current: firstImage ? '/images' + firstImage : null
+      current: firstImage ? toURI('/images' + firstImage) : null
     }
   }
   const result = await (getFolder(folder))
   result.previousFolder = previousFolder ? '/show' + previousFolder : null
   result.nextFolder = nextFolder ? '/show' + nextFolder : null
-  let folders = []
+  let folders = {
+    complete: [],
+    incomplete: []
+  }
   if (recurse) {
     for (let dir of await db('folders').select(['path', 'current']).where({ folder }).orderBy('sortKey')) {
-      folders.push(await getFolder(dir.path))
+      const folder = await getFolder(dir.path)
+      if (folder.imageCount === 0) {
+        continue
+      }
+      if (folder.imageCount === folder.seenCount) {
+        folders.complete.push(folder)
+      } else {
+        folders.incomplete.push(folder)
+      }
     }
   }
   let pictures = await db('pictures').select(['path', 'seen']).where({ folder }).orderBy('sortKey')
   pictures.forEach(picture => {
     picture.name = basename(picture.path, extname(picture.path))
-    picture.path = '/images' + picture.path
+    picture.path = toURI('/images' + picture.path)
   })
-  result.folders = folders.filter(f => f.imageCount > 0)
+  result.folders = folders
   result.pictures = pictures
   return result
 }
@@ -92,16 +105,32 @@ async function setLatest (db, path) {
   await db('pictures').update({ seen: true }).where({ path })
 }
 
-async function getBookmarks (db) {
+async function getBookmarks (db, path = '/') {
   let bookmarks = await db('bookmarks').select(['id', 'path', 'name']).orderBy('sortKey')
+  path = toURI(path).replace(/\/$/, '')
   bookmarks = bookmarks.map(bookmark => {
     return {
-      link: `/api/bookmarks/${bookmark.id}`,
-      path: '/images' + bookmark.path,
-      name: bookmark.name
+      link: `/api/bookmarks/id/${bookmark.id}`,
+      path: toURI('/images' + bookmark.path),
+      name: bookmark.name,
+      folder: toURI(dirname(bookmark.path))
     }
   })
-  return bookmarks
+  const result = {
+    current: [],
+    children: [],
+    other: []
+  }
+  bookmarks.forEach(bookmark => {
+    if (bookmark.folder === path) {
+      result.current.push(bookmark)
+    } else if (bookmark.folder.indexOf(path) === 0) {
+      result.children.push(bookmark)
+    } else {
+      result.other.push(bookmark)
+    }
+  })
+  return result
 }
 
 async function addBookmark (db, path) {
@@ -157,15 +186,19 @@ module.exports = (db) => {
   router.get('/bookmarks', async (req, res) => {
     res.json(await getBookmarks(db))
   })
+  router.get('/bookmarks/list/*', async (req, res) => {
+    let folder = '/' + (req.params[0] || '')
+    res.json(await getBookmarks(db, folder))
+  })
   router.post('/bookmarks/add', async (req, res) => {
     await addBookmark(db, req.body.path)
     res.status(200).end()
   })
-  router.delete('/bookmarks/:id', async (req, res) => {
+  router.delete('/bookmarks/id/:id', async (req, res) => {
     await deleteBookmark(db, req.params.id)
     res.status(200).end()
   })
-  router.get('/bookmarks/:id', async (req, res) => {
+  router.get('/bookmarks/id/:id', async (req, res) => {
     res.redirect(await goToBookmark(db, req.params.id))
   })
 

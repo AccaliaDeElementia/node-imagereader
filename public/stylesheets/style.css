@@ -55,6 +55,14 @@ nav.ease {
 #mainMenu {
   position: absolute;
   overflow-y: scroll; }
+  #mainMenu .nav-tabs {
+    position: fixed;
+    height: 2.5rem;
+    z-index: 101; }
+    #mainMenu .nav-tabs li {
+      height: 2.5rem; }
+  #mainMenu .tab-content {
+    margin-top: 2.5rem; }
   #mainMenu #folders .card {
     width: 15rem; }
     #mainMenu #folders .card .card-img-top {

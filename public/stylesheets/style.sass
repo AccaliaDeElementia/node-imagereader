@@ -8,7 +8,9 @@ body
     left: 0
     right: 0
     bottom: 0
-    
+
+
+
 nav.ease
   transition: all 0.5s ease
 
@@ -59,6 +61,15 @@ nav.ease
 #mainMenu
   position: absolute
   overflow-y: scroll
+
+  .nav-tabs
+    position: fixed
+    height: 2.5rem
+    z-index: 101
+    li
+      height: 2.5rem
+  .tab-content
+    margin-top: 2.5rem
 
   #folders .card
     width: 15rem

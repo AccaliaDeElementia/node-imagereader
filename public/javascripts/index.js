@@ -1,11 +1,6 @@
 'use sanity'
 /* global $, picturereaderdata */
 
-const encode = path => {
-  const mapper = str => encodeURIComponent(str).replace(/#/g, '%35')
-  return path.split('/').map(mapper).join('/')
-}
-
 $('#mainMenuItem').click(() => {
   $('#mainMenu').toggle()
 })
@@ -56,7 +51,7 @@ const loadImage = () => {
   $('.status-bar .center').text(pic.name)
   $('.status-bar .left').text(`(${imageIdx + 1}/${picturereaderdata.pictures.length})`)
   $.post('/api/navigate/latest', { path: pic.path })
-  $('#mainImage img').attr('src', encode(pic.path))
+  $('#mainImage img').attr('src', pic.path)
   $('#mainMenu').hide()
 }
 loadImage()

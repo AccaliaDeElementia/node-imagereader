@@ -5,7 +5,7 @@ module.exports = (db) => {
   const rootRoute = async (req, res) => {
     const folder = '/' + (req.params[0] || '')
     const data = await api.listing(db, folder)
-    const bookmarks = await api.getBookmarks(db)
+    const bookmarks = await api.getBookmarks(db, folder)
     res.render('index', { data, bookmarks })
   }
   router.get('/', rootRoute)
