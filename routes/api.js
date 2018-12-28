@@ -4,7 +4,8 @@ const { posix: { dirname, basename, extname, sep } } = require('path')
 
 const { toSortKey } = require('../utils/utils')
 
-const toURI = uri => uri.split('/').map(str => encodeURIComponent(str).replace(/#/g, '%35')).join('/')
+const toURI = uri => uri.split('/').map(encodeURIComponent).join('/')
+const fromURI = uri => uri.split('/').map(decodeURIComponent).join('/')
 
 async function listing (db, folder, recurse = true) {
   if (folder[folder.length - 1] !== sep) {
@@ -99,7 +100,7 @@ async function listing (db, folder, recurse = true) {
 }
 
 async function setLatest (db, path) {
-  path = decodeURI(path).replace(/^\/images/, '')
+  path = fromURI(path).replace(/^\/images/, '')
   const folder = dirname(path) + sep
   await db('folders').update({ current: path }).where({ path: folder })
   await db('pictures').update({ seen: true }).where({ path })
@@ -150,8 +151,7 @@ async function deleteBookmark (db, id) {
 async function goToBookmark (db, id) {
   const bookmark = await db('bookmarks').select('path').where({ id })
   await setLatest(db, bookmark[0].path)
-  const mapper = str => encodeURIComponent(str).replace(/#/g, '%35')
-  return ('/show' + dirname(bookmark[0].path)).split('/').map(mapper).join('/')
+  return toURI('/show' + dirname(bookmark[0].path))
 }
 
 async function markRead (db, path, seenValue = true) {
