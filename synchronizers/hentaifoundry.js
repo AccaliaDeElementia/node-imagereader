@@ -4,6 +4,7 @@ const Synchronizer = require('./synchronizer')
 
 const Browser = require('../utils/browser')
 const config = require('../utils/config')
+const { toFolderName } = require('../utils/utils')
 const { join } = require('path')
 
 const cheerio = require('cheerio')
@@ -106,7 +107,7 @@ const downloadSection = async ({ browser, user, section = '', db, pageLimit = In
       logger(`${id} - ${title}`)
       const link = `https:${$('.boxbody img').attr('src')}`
       const ext = (/[.]([^.]+)$/.exec(link) || [null, 'jpg'])[1]
-      const dest = join(user, `${title} - ${id}.${ext}`)
+      const dest = join(user, `${toFolderName(title)} - ${id}.${ext}`)
       await browser.download(link, dest)
       await db.insert({ id, user, fetched: true }).into('hentaifoundrysync')
       idMap[id] = true

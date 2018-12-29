@@ -8,6 +8,7 @@ const domain = 'https://www.furaffinity.net'
 const folderPrefix = 'furaffinity'
 
 const Browser = require('../utils/browser')
+const { toFolderName } = require('../utils/utils.js')
 
 const login = async () => {
   const browser = await new Browser(folderPrefix).prepare()
@@ -57,7 +58,7 @@ const fetchImage = async ({ browser, logger, user, prefix, id }) => {
   try {
     extension = /[.]([^.]+)$/.exec(imageUri)[1]
   } catch (e) { }
-  const filename = `${title} - ${id}.${extension}`
+  const filename = `${toFolderName(title)} - ${id}.${extension}`
   const dest = `${prefix}/${filename}`
   logger(`${user} - ${title}`)
   await browser.download(imageUri, dest)
@@ -96,13 +97,13 @@ const fetchGalleries = async ({ db, logger, browser, user }) => {
   const $ = await browser.fetchCheerio(domain + mainGallery)
   const folders = []
   $('.folder-list a').each((_, elem) => {
-    let name = $(elem).text()
+    let name = toFolderName($(elem).text())
     if (name === 'Scraps') {
       return
     }
     const parent = $(elem).closest('ul').prev()
     if (parent.is('h5')) {
-      name = `${parent.text()}/${name}`
+      name = `${toFolderName(parent.text())}/${name}`
     }
     folders.push([`${user}/${name}`, $(elem).attr('href')])
   })
