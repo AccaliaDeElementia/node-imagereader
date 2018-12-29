@@ -156,6 +156,7 @@ async function goToBookmark (db, id) {
 
 async function markRead (db, path, seenValue = true) {
   path = path.replace(/^\/show/, '')
+  path = fromURI(path)
   console.log(path)
   await db('pictures').update({ seen: seenValue }).where('folder', 'like', `${path}%`)
 }
