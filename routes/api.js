@@ -136,7 +136,8 @@ async function getBookmarks (db, path = '/') {
 
 async function addBookmark (db, path) {
   path = path.replace(/^\/images/, '')
-  const bookmark = await db('bookmarks').select('id').where({ path })[0]
+  path = fromURI(path)
+  const bookmark = (await db('bookmarks').select('id').where({ path }))[0]
   if (!bookmark) {
     const name = `${basename(dirname(path))} - ${basename(path, extname(path))}`
     const sortKey = toSortKey(name)
