@@ -7,9 +7,17 @@ const delay = async (milliseconds = 100) => {
 
 const toFolderName = (title) => title.trim().replace(/[/?<>\\:*|"^]/g, '-').replace(/[.]$/, '').replace(/^[.]+/, '')
 
-const toSortKey = name => {
-  const base = '0'.repeat(30)
-  return name.toLowerCase().replace(/(\d+)/g, num => `${base}${num}`.slice(-30))
+const { wordsToNumbers } = require('words-to-numbers')
+
+const toSortKey = (name, format = 2, padLength = 20) => {
+  switch (format) {
+    case 1:
+      const base1 = '0'.repeat(30)
+      return name.toLowerCase().replace(/(\d+)/g, num => `${base1}${num}`.slice(-30))
+    default:
+      const base = '0'.repeat(padLength)
+      return `${wordsToNumbers(name.toLowerCase(), { impliedHundreds: true })}`.replace(/(\d+)/g, num => `${base}${num}`.slice(-padLength))
+  }
 }
 
 module.exports = {

@@ -22,7 +22,8 @@
     "pug": "2.0.0-beta11",
     "request": "^2.88.0",
     "sqlite3": "^4.0.2",
-    "tough-cookie": "^2.4.3"
+    "tough-cookie": "^2.4.3",
+    "words-to-numbers": "^1.5.1"
   },
   "devDependencies": {
     "eslint": "^5.7.0",
