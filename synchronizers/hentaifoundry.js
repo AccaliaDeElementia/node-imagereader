@@ -109,7 +109,14 @@ const downloadSection = async ({ browser, user, section = '', db, pageLimit = In
       const ext = (/[.]([^.]+)$/.exec(link) || [null, 'jpg'])[1]
       const dest = join(user, `${toFolderName(title)} - ${id}.${ext}`)
       await browser.download(link, dest)
-      await db.insert({ id, user, fetched: true }).into('hentaifoundrysync')
+      for (let i = 1; i <= 5; i++) {
+        try {
+          await db.insert({ id, user, fetched: true }).into('hentaifoundrysync')
+          break
+        } catch (e) {
+          logger(`Error Syncing id ${id}, Try ${i}/5`)
+        }
+      }
       idMap[id] = true
     }
     if (!page.hasNext) {

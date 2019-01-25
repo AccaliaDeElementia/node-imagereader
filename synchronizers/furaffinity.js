@@ -79,7 +79,14 @@ const fetchGallery = async ({ db, browser, logger, user, prefix, uri, ids }) => 
     })
     for (let id of submissions) {
       await fetchImage({ browser, prefix, id, logger, user })
-      await db.insert({ submission: id, user, fetched: true }).into('furaffinitysync')
+      for (let i = 1; i <= 5; i++) {
+        try {
+          await db.insert({ submission: id, user, fetched: true }).into('furaffinitysync')
+          break
+        } catch (e) {
+          logger(`Error Syncing id ${id}, Try ${i}/5`)
+        }
+      }
       ids[id] = true
     }
     uri = $('.fancy-pagination .button-link.right').attr('href')
