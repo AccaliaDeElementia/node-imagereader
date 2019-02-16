@@ -5,6 +5,14 @@ $('#mainMenuItem').click(() => {
   $('#mainMenu').toggle()
 })
 
+$('input[name=ShowUnseenOnly]').change(() => {
+  window.localStorage['ComicReader-ShowUnseenOnly'] = $('input[name=ShowUnseenOnly]').prop('checked')
+})
+
+const showUnseenOnly = () => window.localStorage['ComicReader-ShowUnseenOnly'] === 'true'
+
+$('input[name=ShowUnseenOnly]').prop('checked', showUnseenOnly())
+
 $('#bookmarks button.remove').on('click', function () {
   const self = $(this).closest('.card')
   $.ajax({
@@ -167,11 +175,17 @@ document.onkeyup = (evt) => {
       evt.key.toUpperCase()
   var action = ''
   switch (key) {
+    case 'ARROWUP':
+      $('#mainMenu').show()
+      break
+    case 'ARROWdown':
+      $('#mainMenu').hide()
+      break
     case 'ARROWRIGHT':
-      action = 'nextImage'
+      action = showUnseenOnly() ? 'nextUnseen' : 'nextImage'
       break
     case 'ARROWLEFT':
-      action = 'prevImage'
+      action = showUnseenOnly() ? 'previousUnseen' : 'prevImage'
       break
   }
   (navigation[action] || function () {})()
@@ -218,11 +232,19 @@ $('#mainImage').on('touchstart', event => {
   const pageWidth = window.innerWidth || document.body.clientWidth
   const x = evt.pageX
   if (x < pageWidth / 3) {
-    navigation.prevImage()
+    if (showUnseenOnly()) {
+      navigation.previousUnseen()
+    } else {
+      navigation.prevImage()
+    }
   } else if (x < pageWidth * 2 / 3) {
     $('#mainMenu').show()
   } else {
-    navigation.nextImage()
+    if (showUnseenOnly()) {
+      navigation.nextUnseen()
+    } else {
+      navigation.nextImage()
+    }
   }
 })
 
@@ -238,9 +260,17 @@ const handleGesture = (startTouch, endTouch) => {
   if (Math.abs(swipeX) > treshold || Math.abs(swipeY) > treshold) {
     if (swipeHorizontal) {
       if (swipeX > 0) {
-        navigation.prevImage()
+        if (showUnseenOnly()) {
+          navigation.previousUnseen()
+        } else {
+          navigation.prevImage()
+        }
       } else {
-        navigation.nextImage()
+        if (showUnseenOnly()) {
+          navigation.nextUnseen()
+        } else {
+          navigation.nextImage()
+        }
       }
     }
     if (swipeVertical) {
@@ -257,4 +287,9 @@ const handleGesture = (startTouch, endTouch) => {
       // navigation.nextImage()
     }
   }
+}
+
+if (picturereaderdata.pictures.length && picturereaderdata.pictures.every(pic => pic.seen)) {
+  $('#folders-tab').tab('show')
+  $('#mainMenu').show()
 }

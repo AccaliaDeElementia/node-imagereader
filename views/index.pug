@@ -4,6 +4,7 @@ extends layout
 block navigation
   div.d-inline-block.mr-auto.ml-auto.title= data.name
   div.d-inline-block
+    input(type='checkbox' data-toggle='toggle' data-on='View Unseen' data-off='View All' name='ShowUnseenOnly', data-offstyle='success', data-onstyle='info')
     button.btn#mainMenuItem
       i.material-icons menu
 
@@ -19,8 +20,6 @@ block content
       ul.nav.nav-tabs.bg-light(role="tablist")
         li.nav-item
           a.nav-link.active#actions-tab(data-toggle="tab" href="#actions" role="tab") Actions
-        li.nav-item
-          a.nav-link#folders-tab(data-toggle="tab" href="#folders" role="tab") Folders
         li.nav-item
           a.nav-link#pictures-tab(data-toggle="tab" href="#pictures" role="tab") Pictures
         li.nav-item
@@ -90,39 +89,39 @@ block content
                     i.material-icons= action.image
                   div.card-body
                     h5.card-title.text-center= action.name
-        div.tab-pane#folders(role="tabpanel")
-          h3 Folders
-          if data.name !== ''
-            h4
-              a(href=parentPath) 
+          div#folders
+            h3 Folders
+            if data.name !== ''
+              h4
+                a(href=parentPath) 
+                  i.material-icons folder
+                  span Parent
+            mixin folderCard(folder)
+              div.card.d-inline-block.m-2
+                a(class=`${folder.seenCount === folder.imageCount ? 'text-success' : 'text-primary'}` href=folder.path)
+                  if folder.current
+                    img.card-img-top(src=folder.current alt=folder.name)
+                  else
+                    div.card-img-top
+                      i.material-icons folder
+                div.card-body
+                  h5.card-title
+                    a(class=`${folder.seenCount === folder.imageCount ? 'text-success' : 'text-primary'}` href=folder.path)= folder.name
+                  div.progress
+                    - const text = `${folder.seenCount}/${folder.imageCount}`
+                    div(class=`progress-bar ${folder.seenCount === folder.imageCount ? 'bg-success' : ''}` role="progressbar" style=`width: ${folder.percent}%` aria-valuenow=`${folder.percent}` aria-valuemin="0" aria-valuemax="100")= text
+            if data.folders.incomplete.length > 0
+              h4 
                 i.material-icons folder
-                span Parent
-          mixin folderCard(folder)
-            div.card.d-inline-block.m-2
-              a(class=`${folder.seenCount === folder.imageCount ? 'text-success' : 'text-primary'}` href=folder.path)
-                if folder.current
-                  img.card-img-top(src=folder.current alt=folder.name)
-                else
-                  div.card-img-top
-                    i.material-icons folder
-              div.card-body
-                h5.card-title
-                  a(class=`${folder.seenCount === folder.imageCount ? 'text-success' : 'text-primary'}` href=folder.path)= folder.name
-                div.progress
-                  - const text = `${folder.seenCount}/${folder.imageCount}`
-                  div(class=`progress-bar ${folder.seenCount === folder.imageCount ? 'bg-success' : ''}` role="progressbar" style=`width: ${folder.percent}%` aria-valuenow=`${folder.percent}` aria-valuemin="0" aria-valuemax="100")= text
-          if data.folders.incomplete.length > 0
-            h4 
-              i.material-icons folder
-              span Incomplete
-            each folder in data.folders.incomplete
-              +folderCard(folder)
-          if data.folders.complete.length > 0
-            h4
-              i.material-icons folder
-              span Complete
-            each folder in data.folders.complete
-              +folderCard(folder)
+                span Incomplete
+              each folder in data.folders.incomplete
+                +folderCard(folder)
+            if data.folders.complete.length > 0
+              h4
+                i.material-icons folder
+                span Complete
+              each folder in data.folders.complete
+                +folderCard(folder)
         div.tab-pane#pictures(role="tabpanel")
           h3 Pictures
           div.d-fled.flex-wrap.justify-content-center.w-100
