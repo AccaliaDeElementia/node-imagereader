@@ -90,12 +90,8 @@ block content
                   div.card-body
                     h5.card-title.text-center= action.name
           div#folders
-            h3 Folders
-            if data.name !== ''
-              h4
-                a(href=parentPath) 
-                  i.material-icons folder
-                  span Parent
+            if data.folders.incomplete.length > 0 || data.folders.complete.length > 0
+              h3 Folders
             mixin folderCard(folder)
               div.card.d-inline-block.m-2
                 a(class=`${folder.seenCount === folder.imageCount ? 'text-success' : 'text-primary'}` href=folder.path)
