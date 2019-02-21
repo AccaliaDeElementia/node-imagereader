@@ -75,7 +75,12 @@ async function login (browser, logger) {
 const getUserPage = async ({ browser, user, pageNumber = 1, section = '' }) => {
   const page = await browser.fetch(`${domain}/pictures/user/${user}/${section}/page/${pageNumber}`)
   const $ = cheerio.load(page.body)
-  const pictures = $('.thumbTitle a').map((i, e) => e.attribs.href).get()
+  const pictures = $('.thumbTitle a').map((i, e) => e.attribs.href).get().map(p => {
+    return {
+      picture: p,
+      id: +(/^\/(?:[^/]+\/){3}([^/]+)\/(.*)$/.exec(p)[1])
+    }
+  })
   if (!pictures.length) {
     return { pictures: [], hasNext: false, totalPictures: 0 }
   }
@@ -84,7 +89,7 @@ const getUserPage = async ({ browser, user, pageNumber = 1, section = '' }) => {
   return { pictures, hasNext, totalPictures }
 }
 
-const downloadSection = async ({ browser, user, section = '', db, pageLimit = Infinity, logger }) => {
+const downloadSection = async ({ browser, user, section = '', db, pageLimit = Infinity, logger, fetchedAll }) => {
   let pageNumber = 1
   let count = 0
   const idList = await db.select('id').from('hentaifoundrysync').where({ user })
@@ -96,11 +101,11 @@ const downloadSection = async ({ browser, user, section = '', db, pageLimit = In
     const page = await getUserPage({ browser, user, section, pageNumber })
     count += page.pictures.length
     logger(`${user} ${section || 'pictures'} - Page ${pageNumber} - Images ${count}/${page.totalPictures}`)
-    for (let picture of page.pictures) {
-      const id = +(/^\/(?:[^/]+\/){3}([^/]+)\/(.*)$/.exec(picture)[1])
-      if (idMap[id]) {
-        continue
-      }
+    let pictures = page.pictures.filter(p => !idMap[p.id])
+    if (fetchedAll && pictures.length === 0) {
+      break
+    }
+    for (let { picture, id } of pictures) {
       const result = await browser.fetch(`${domain}${picture}`)
       const $ = cheerio.load(result.body)
       const title = $('.boxheader .imageTitle').text().replace(/[/?<>\\:*|"^]/g, '-')
@@ -137,10 +142,11 @@ const runSync = async (db, logger) => {
     await login(browser, logger)
   }
   logger('hentaifoundry synchronization begins')
-  const watchers = (await db.select().from('hentaifoundrywatched').where({ active: 1 })).map(u => u.user)
-  for (let user of watchers) {
-    await downloadSection({ browser, user, db, logger })
-    await downloadSection({ browser, user, section: 'scraps', db, logger })
+  const watchers = (await db.select().from('hentaifoundrywatched').where({ active: 1 }))
+  for (let { user, fetchedAll } of watchers) {
+    await downloadSection({ browser, user, db, logger, fetchedAll })
+    await downloadSection({ browser, user, section: 'scraps', db, logger, fetchedAll })
+    await db('hentaifoundrywatched').update({ fetchedAll: true }).where({ user: user })
   }
   logger(`hentaifoundry synchronization complete after ${(Date.now() - now) / 1000}s`)
   return true

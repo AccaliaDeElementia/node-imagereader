@@ -46,8 +46,9 @@ const login = async () => {
   console.log($('#my-username').text())
 }
 
-const fetchImage = async ({ browser, logger, user, prefix, id }) => {
+const fetchImage = async ({ browser, logger, user, id }) => {
   const $ = await browser.fetchCheerio(`${domain}/view/${id}`)
+  const folder = $('.folder-list-container ul li:first-of-type a *').map((_, e) => $(e).text().trim()).get().join('/')
   const imageSrc = $('#submissionImg').data('fullview-src')
   if (!imageSrc) {
     return
@@ -59,12 +60,12 @@ const fetchImage = async ({ browser, logger, user, prefix, id }) => {
     extension = /[.]([^.]+)$/.exec(imageUri)[1]
   } catch (e) { }
   const filename = `${toFolderName(title)} - ${id}.${extension}`
-  const dest = `${prefix}/${filename}`
+  const dest = `${user}/${folder}/${filename}`.replace(/\/\/+/g, '/')
   logger(`${user} - ${title}`)
   await browser.download(imageUri, dest)
 }
 
-const fetchGallery = async ({ db, browser, logger, user, prefix, uri, ids }) => {
+const fetchGallery = async ({ db, browser, logger, user, fetchedAll, prefix, uri, ids }) => {
   let i = 1
   while (uri) {
     logger(`${prefix} - Page ${i}`)
@@ -77,8 +78,11 @@ const fetchGallery = async ({ db, browser, logger, user, prefix, uri, ids }) => 
         submissions.push(id)
       }
     })
+    if (fetchedAll && submissions.length === 0) {
+      break
+    }
     for (let id of submissions) {
-      await fetchImage({ browser, prefix, id, logger, user })
+      await fetchImage({ browser, id, logger, user })
       for (let i = 1; i <= 5; i++) {
         try {
           await db.insert({ submission: id, user, fetched: true }).into('furaffinitysync')
@@ -94,30 +98,18 @@ const fetchGallery = async ({ db, browser, logger, user, prefix, uri, ids }) => 
   }
 }
 
-const fetchGalleries = async ({ db, logger, browser, user }) => {
+const fetchGalleries = async ({ db, logger, browser, user, fetchedAll }) => {
   const idList = await db.select('submission').from('furaffinitysync').where({ user, fetched: true })
   const ids = {}
   idList.forEach(({ submission }) => {
     ids[submission] = true
   })
   const mainGallery = `/gallery/${user}`
-  const $ = await browser.fetchCheerio(domain + mainGallery)
   const folders = []
-  $('.folder-list a').each((_, elem) => {
-    let name = toFolderName($(elem).text())
-    if (name === 'Scraps') {
-      return
-    }
-    const parent = $(elem).closest('ul').prev()
-    if (parent.is('h5')) {
-      name = `${toFolderName(parent.text())}/${name}`
-    }
-    folders.push([`${user}/${name}`, $(elem).attr('href')])
-  })
   folders.push([user, mainGallery])
   folders.push([`${user}/Scraps`, `/scraps/${user}/`])
   for (let [prefix, uri] of folders) {
-    await fetchGallery({ browser, user, prefix, uri, ids, db, logger })
+    await fetchGallery({ browser, user, fetchedAll, prefix, uri, ids, db, logger })
   }
 }
 
@@ -132,10 +124,11 @@ const runSync = async (db, logger) => {
   }
   const now = Date.now()
   logger('Fur Affinity synchronization begins')
-  const watchers = (await db.select().from('furaffinitywatched').where({ active: 1 })).map(u => u.user)
-  for (let user of watchers) {
+  const watchers = (await db.select().from('furaffinitywatched').where({ active: 1 }))
+  for (let { user, fetchedAll } of watchers) {
     logger(`Fetching images for ${user}`)
-    await fetchGalleries({ browser, user, db, logger })
+    await fetchGalleries({ browser, user, fetchedAll, db, logger })
+    await db('furaffinitywatched').update({ fetchedAll: true }).where({ user: user })
   }
   logger(`Fur Affinity synchronization complete after ${(Date.now() - now) / 1000}s`)
   return true
