@@ -84,7 +84,7 @@ block content
           each actionRow in actionRows
             div.d-flex.justify-content-center 
               each action in actionRow
-                div(class=`card d-inline-block m-2 action-${action.name.replace(/\s+/g, '').toLowerCase()}`)
+                div.card.d-inline-block.m-2.action-button(data-action=`${action.name.replace(/\s+/g, '').split('').map((o, i)=> i === 0 ? o.toLowerCase() : o).join('')}`)
                   div.card-img-top
                     i.material-icons= action.image
                   div.card-body
