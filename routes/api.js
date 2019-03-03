@@ -35,13 +35,13 @@ async function listing (db, folder, recurse = true) {
     .limit(1)
     .select('path')
     .where({ folder: parentFolder })
-    .andWhere('sortKey', '<', thisFolder.sortKey)
+    .andWhere('sortKey', '<', thisFolder.sortKey || '')
     .orderBy('sortKey', 'desc'))[0] || {}).path
   const nextFolder = ((await db('folders')
     .limit(1)
     .select('path')
     .where({ folder: parentFolder })
-    .andWhere('sortKey', '>', thisFolder.sortKey)
+    .andWhere('sortKey', '>', thisFolder.sortKey || '')
     .orderBy('sortKey', 'asc'))[0] || {}).path
   const getFolder = async folderInfo => {
     const path = folderInfo.path || ''

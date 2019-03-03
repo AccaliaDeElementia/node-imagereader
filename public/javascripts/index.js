@@ -190,6 +190,12 @@ function Navigation () {
       case 'ARROWLEFT':
         $('#mainImage').trigger('previous')
         break
+      case 'HOME':
+        $('#mainImage').trigger('first')
+        break
+      case 'END':
+        $('#mainImage').trigger('last')
+        break
     }
   }
 
