@@ -11,6 +11,7 @@ async function listing (db, folder, recurse = true) {
   if (folder[folder.length - 1] !== sep) {
     folder += sep
   }
+  const parentFolder = dirname(folder) + sep
   const folderInfoSubQuery = db('pictures')
     .select('folder')
     .count('* as totalCount')
@@ -29,26 +30,27 @@ async function listing (db, folder, recurse = true) {
       this.on('folderInfos.firstImage', '=', 'pictures.sortKey')
         .andOn('folderInfos.folder', '=', 'pictures.folder')
     })
+  const thisFolder = (await db('folders').select(['path', 'current', 'sortKey']).where({ path: folder }))[0] || {}
   const previousFolder = ((await db('folders')
     .limit(1)
     .select('path')
-    .where({ folder: dirname(folder) + sep })
-    .andWhere('sortKey', '<', toSortKey(basename(folder)))
+    .where({ folder: parentFolder })
+    .andWhere('sortKey', '<', thisFolder.sortKey)
     .orderBy('sortKey', 'desc'))[0] || {}).path
   const nextFolder = ((await db('folders')
     .limit(1)
     .select('path')
-    .where({ folder: dirname(folder) + sep })
-    .andWhere('sortKey', '>', toSortKey(basename(folder)))
+    .where({ folder: parentFolder })
+    .andWhere('sortKey', '>', thisFolder.sortKey)
     .orderBy('sortKey', 'asc'))[0] || {}).path
-  const getFolder = async path => {
-    const folderInfo = (await db('folders').select(['path', 'current']).where({ path }))[0] || {}
+  const getFolder = async folderInfo => {
+    const path = folderInfo.path || ''
     const counts = folderInfos
       .filter(i => i.folder.substring(0, path.length) === path)
       .reduce((accumulator, current) => {
         accumulator.totalSeen += +current.totalSeen
         accumulator.totalCount += +current.totalCount
-        if (current.folder === path) {
+        if (current.folder === folderInfo.path) {
           accumulator.firstImage = current.firstImage
         }
         return accumulator
@@ -60,16 +62,17 @@ async function listing (db, folder, recurse = true) {
       })
     const firstImage = folderInfo.current ? folderInfo.current : counts.firstImage
     return {
-      path: toURI('/show' + path),
+      path: toURI('/show' + folderInfo.path),
       name: basename(path),
       parent: dirname(path + sep),
       percent: counts.totalSeen / counts.totalCount * 100,
       imageCount: counts.totalCount,
       seenCount: counts.totalSeen,
-      current: firstImage ? toURI('/images' + firstImage) : null
+      current: firstImage ? toURI('/images' + firstImage) : null,
+      sortKey: folderInfo.sortKey
     }
   }
-  const result = await (getFolder(folder))
+  const result = await (getFolder(thisFolder))
   result.previousFolder = previousFolder ? toURI('/show' + previousFolder) : null
   result.nextFolder = nextFolder ? toURI('/show' + nextFolder) : null
   let folders = {
@@ -78,7 +81,7 @@ async function listing (db, folder, recurse = true) {
   }
   if (recurse) {
     for (let dir of await db('folders').select(['path', 'current']).where({ folder }).orderBy('sortKey')) {
-      const folder = await getFolder(dir.path)
+      const folder = await getFolder(dir)
       if (folder.imageCount === 0) {
         continue
       }
