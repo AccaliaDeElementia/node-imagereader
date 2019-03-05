@@ -84,10 +84,16 @@ function MainImage () {
     index--
   })).on('nextImage', () => changeImage(index < pics.length - 1, () => {
     index++
-  })).on('previousUnseen', () => changeImage(pics.some((e, i) => i < index && !e.seen), () => {
-    index = pics.reduce((acc, pic, i) => !pic.seen && i < index ? Math.max(acc, i) : acc, 0)
-  })).on('nextUnseen', () => changeImage(pics.some((e, i) => i > index && !e.seen), () => {
+  })).on('previousUnseen', () => changeImage(pics.some(e => !e.seen), () => {
+    index = pics.reduce((acc, pic, i) => !pic.seen && i < index ? Math.max(acc, i) : acc, -1)
+    if (index < 0) {
+      index = pics.reduce((acc, pic, i) => !pic.seen ? Math.max(acc, i) : acc, -1)
+    }
+  })).on('nextUnseen', () => changeImage(pics.some((e, i) => !e.seen), () => {
     index = pics.reduce((acc, pic, i) => !pic.seen && i > index ? Math.min(acc, i) : acc, Infinity)
+    if (!isFinite(index)) {
+      index = pics.reduce((acc, pic, i) => !pic.seen ? Math.min(acc, i) : acc, Infinity)
+    }
   })).on('next', () => {
     if (isUnseenOnly()) {
       $('#mainImage').trigger('nextUnseen')
