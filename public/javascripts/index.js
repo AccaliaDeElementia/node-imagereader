@@ -9,7 +9,7 @@ $('#mainImage').on('error', () => {
 
 function MainMenu () {
   $('#mainMenu').on('showMenu', () => {
-    $('#mainMenu').show()
+    setTimeout(() => $('#mainMenu').show(), 100)
   })
   $('#mainMenu').on('hideMenu', () => {
     if (!picturereaderdata.pictures.length) {
