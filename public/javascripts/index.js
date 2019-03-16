@@ -25,10 +25,10 @@ function MainMenu () {
     }
   })
   if (picturereaderdata.pictures.length && picturereaderdata.pictures.every(pic => pic.seen)) {
-    $('#mainMenu').trigger('showMenu')
+    $('#mainMenu').show()
   }
   if (!picturereaderdata.pictures.length) {
-    $('#mainMenu').trigger('showMenu')
+    $('#mainMenu').show()
   } else {
     $('#mainImage img').show()
   }
@@ -74,7 +74,7 @@ function MainImage () {
     }
   }
   loadImage(pics[index])
-  $('body').on('randomImage', () => changeImage(true, () => {
+  $('body').on('random', () => changeImage(true, () => {
     index = Math.floor(Math.random() * pics.length)
   })).on('first', () => changeImage(index > 0, () => {
     index = 0
