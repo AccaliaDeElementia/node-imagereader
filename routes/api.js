@@ -163,6 +163,9 @@ async function markRead (db, path, seenValue = true) {
   path = fromURI(path)
   console.log(path)
   await db('pictures').update({ seen: seenValue }).where('folder', 'like', `${path}%`)
+  if (!seenValue) {
+    await db('folders').update({ current: null }).where('path', 'like', `${path}%`)
+  }
 }
 
 module.exports = (db) => {
