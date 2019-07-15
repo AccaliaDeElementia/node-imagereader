@@ -15,7 +15,20 @@ const chunk = (arr, size = 200) => {
   return res
 }
 
+const resetStaging = async (db) => {
+  await db.schema.dropTableIfExists('syncitems')
+  await db.schema.createTable('syncitems', (table) => {
+    table.increments('id').primary()
+    table.string('folder', 8192)
+    table.string('path', 8192)
+    table.string('sortKey', 4096)
+    table.boolean('isFile').notNullable().defaultTo(false)
+    table.index('path')
+  })
+}
+
 const synchronizeDb = async (db, logger) => {
+  await resetStaging(db)
   const now = Date.now()
   logger('picture synchronization begins')
   let dirs = 0
