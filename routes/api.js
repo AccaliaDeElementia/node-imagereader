@@ -171,7 +171,7 @@ async function markRead (db, path, seenValue = true) {
 module.exports = (db) => {
   const router = express.Router()
 
-  router.get('/', async (req, res) => {
+  router.get('/', async (_, res) => {
     const image = await db('pictures').select('path').orderBy(db.raw('RANDOM()')).limit(1)
     res.render('index', { image: '/images' + image[0].path })
   })
@@ -191,7 +191,7 @@ module.exports = (db) => {
     await markRead(db, req.body.path, false)
     res.status(200).end()
   })
-  router.get('/bookmarks', async (req, res) => {
+  router.get('/bookmarks', async (_, res) => {
     res.json(await getBookmarks(db))
   })
   router.get('/bookmarks/list/*', async (req, res) => {

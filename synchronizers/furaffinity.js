@@ -24,7 +24,7 @@ const login = async () => {
     input: process.stdin,
     output: process.stdout
   })
-  const prompt = (question) => new Promise((resolve, reject) => rl.question(question, async (answer) => resolve(answer)))
+  const prompt = (question) => new Promise((resolve) => rl.question(question, async (answer) => resolve(answer)))
   const captcha = await prompt('Captcha Result: ')
   const username = await prompt('Username: ')
   const password = await prompt('Password: ')

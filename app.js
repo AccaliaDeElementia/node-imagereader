@@ -52,11 +52,11 @@ async function startServer (app) {
   // error handler
   // catch 404 and forward to error handler
   const createError = require('http-errors')
-  app.use(function (req, res, next) {
+  app.use(function (_, __, next) {
     next(createError(404))
   })
 
-  app.use(function (err, req, res, next) {
+  app.use(function (err, req, res, _) {
     // set locals, only providing error in development
     res.locals.message = err.message
     res.locals.error = req.app.get('env') === 'development' ? err : {}
@@ -91,3 +91,4 @@ async function startServer (app) {
 setupMiddleware()
   .then(createRouters)
   .then(startServer)
+  .then(() => console.log('Startup complete'))

@@ -75,7 +75,7 @@ async function login (browser, logger) {
 const getUserPage = async ({ browser, user, pageNumber = 1, section = '' }) => {
   const page = await browser.fetch(`${domain}/pictures/user/${user}/${section}/page/${pageNumber}`)
   const $ = cheerio.load(page.body)
-  const pictures = $('.thumbTitle a').map((i, e) => e.attribs.href).get().map(p => {
+  const pictures = $('.thumbTitle a').map((_, e) => e.attribs.href).get().map(p => {
     return {
       picture: p,
       id: +(/^\/(?:[^/]+\/){3}([^/]+)\/(.*)$/.exec(p)[1])
@@ -85,7 +85,7 @@ const getUserPage = async ({ browser, user, pageNumber = 1, section = '' }) => {
     return { pictures: [], hasNext: false, totalPictures: 0 }
   }
   const totalPictures = +/of (\d+) result/.exec($('.summary').text())[1]
-  const hasNext = !!$('.yiiPager .next:not(.hidden) a').map((i, e) => e.attribs.href).get(0)
+  const hasNext = !!$('.yiiPager .next:not(.hidden) a').map((_, e) => e.attribs.href).get(0)
   return { pictures, hasNext, totalPictures }
 }
 
