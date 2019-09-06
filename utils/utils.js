@@ -12,11 +12,9 @@ const { wordsToNumbers } = require('words-to-numbers')
 const toSortKey = (name, format = 2, padLength = 20) => {
   switch (format) {
     case 1:
-      const base1 = '0'.repeat(30)
-      return name.toLowerCase().replace(/(\d+)/g, num => `${base1}${num}`.slice(-30))
+      return name.toLowerCase().replace(/(\d+)/g, num => `${'0'.repeat(30)}${num}`.slice(-30))
     default:
-      const base = '0'.repeat(padLength)
-      return `${wordsToNumbers(name.toLowerCase(), { impliedHundreds: true })}`.replace(/(\d+)/g, num => `${base}${num}`.slice(-padLength))
+      return `${wordsToNumbers(name.toLowerCase(), { impliedHundreds: true })}`.replace(/(\d+)/g, num => `${'0'.repeat(padLength)}${num}`.slice(-padLength))
   }
 }
 

@@ -81,7 +81,7 @@ const fetchGallery = async ({ db, browser, logger, user, fetchedAll, prefix, uri
     if (fetchedAll && submissions.length === 0) {
       break
     }
-    for (let id of submissions) {
+    for (const id of submissions) {
       await fetchImage({ browser, id, logger, user })
       for (let i = 1; i <= 5; i++) {
         try {
@@ -108,7 +108,7 @@ const fetchGalleries = async ({ db, logger, browser, user, fetchedAll }) => {
   const folders = []
   folders.push([user, mainGallery])
   folders.push([`${user}/Scraps`, `/scraps/${user}/`])
-  for (let [prefix, uri] of folders) {
+  for (const [prefix, uri] of folders) {
     await fetchGallery({ browser, user, fetchedAll, prefix, uri, ids, db, logger })
   }
 }
@@ -125,7 +125,7 @@ const runSync = async (db, logger) => {
   const now = Date.now()
   logger('Fur Affinity synchronization begins')
   const watchers = (await db.select().from('furaffinitywatched').where({ active: 1 }))
-  for (let { user, fetchedAll } of watchers) {
+  for (const { user, fetchedAll } of watchers) {
     logger(`Fetching images for ${user}`)
     await fetchGalleries({ browser, user, fetchedAll, db, logger })
     await db('furaffinitywatched').update({ fetchedAll: true }).where({ user: user })

@@ -71,7 +71,7 @@ class Synchronizer {
   logMessage (...lines) {
     const prefix = `[${(new Date()).toISOString().substring(11, 23)}] `
     lines = lines.map(line => `${prefix}${line}`)
-    for (let line of lines) {
+    for (const line of lines) {
       this.logger(line)
     }
     this.log.push(...lines)

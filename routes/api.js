@@ -75,12 +75,12 @@ async function listing (db, folder, recurse = true) {
   const result = await (getFolder(thisFolder))
   result.previousFolder = previousFolder ? toURI('/show' + previousFolder) : null
   result.nextFolder = nextFolder ? toURI('/show' + nextFolder) : null
-  let folders = {
+  const folders = {
     complete: [],
     incomplete: []
   }
   if (recurse) {
-    for (let dir of await db('folders').select(['path', 'current']).where({ folder }).orderBy('sortKey')) {
+    for (const dir of await db('folders').select(['path', 'current']).where({ folder }).orderBy('sortKey')) {
       const folder = await getFolder(dir)
       if (folder.imageCount === 0) {
         continue
@@ -92,7 +92,7 @@ async function listing (db, folder, recurse = true) {
       }
     }
   }
-  let pictures = await db('pictures').select(['path', 'seen']).where({ folder }).orderBy('sortKey')
+  const pictures = await db('pictures').select(['path', 'seen']).where({ folder }).orderBy('sortKey')
   pictures.forEach(picture => {
     picture.name = basename(picture.path, extname(picture.path))
     picture.path = toURI('/images' + picture.path)
@@ -176,7 +176,7 @@ module.exports = (db) => {
     res.render('index', { image: '/images' + image[0].path })
   })
   router.get('/listing/*', async (req, res) => {
-    let folder = '/' + (req.params[0] || '')
+    const folder = '/' + (req.params[0] || '')
     res.json(await listing(db, folder))
   })
   router.post('/navigate/latest', async (req, res) => {
@@ -195,7 +195,7 @@ module.exports = (db) => {
     res.json(await getBookmarks(db))
   })
   router.get('/bookmarks/list/*', async (req, res) => {
-    let folder = '/' + (req.params[0] || '')
+    const folder = '/' + (req.params[0] || '')
     res.json(await getBookmarks(db, folder))
   })
   router.post('/bookmarks/add', async (req, res) => {

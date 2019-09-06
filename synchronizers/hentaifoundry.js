@@ -13,8 +13,8 @@ const domain = 'https://www.hentai-foundry.com'
 const folderPrefix = 'hentaifoundry'
 
 async function checkLogin (browser, logger) {
-  let req = await browser.fetch(`${domain}/?enterAgree=1`)
-  let $ = cheerio.load(req.body)
+  const req = await browser.fetch(`${domain}/?enterAgree=1`)
+  const $ = cheerio.load(req.body)
   const welcomeMessage = $('#headerWelcome')
   if (welcomeMessage.length) {
     logger('Already Logged In')
@@ -45,28 +45,28 @@ async function login (browser, logger) {
     method: 'POST',
     formData: {
       YII_CSRF_TOKEN: nonce,
-      'rating_nudity': 3,
-      'rating_violence': 3,
-      'rating_profanity': 3,
-      'rating_racism': 3,
-      'rating_sex': 3,
-      'rating_spoilers': 3,
-      'rating_yaoi': 1,
-      'rating_yuri': 1,
-      'rating_teen': 1,
-      'rating_guro': 1,
-      'rating_furry': 1,
-      'rating_beast': 1,
-      'rating_male': 1,
-      'rating_female': 1,
-      'rating_futa': 1,
-      'rating_other': 1,
-      'rating_scat': 1,
-      'rating_incest': 1,
-      'rating_rape': 1,
-      'filter_media': 'A',
-      'filter_order': 'date_new',
-      'filter_type': 0
+      rating_nudity: 3,
+      rating_violence: 3,
+      rating_profanity: 3,
+      rating_racism: 3,
+      rating_sex: 3,
+      rating_spoilers: 3,
+      rating_yaoi: 1,
+      rating_yuri: 1,
+      rating_teen: 1,
+      rating_guro: 1,
+      rating_furry: 1,
+      rating_beast: 1,
+      rating_male: 1,
+      rating_female: 1,
+      rating_futa: 1,
+      rating_other: 1,
+      rating_scat: 1,
+      rating_incest: 1,
+      rating_rape: 1,
+      filter_media: 'A',
+      filter_order: 'date_new',
+      filter_type: 0
     }
   })
   return browser.fetch(`${domain}/`)
@@ -101,11 +101,11 @@ const downloadSection = async ({ browser, user, section = '', db, pageLimit = In
     const page = await getUserPage({ browser, user, section, pageNumber })
     count += page.pictures.length
     logger(`${user} ${section || 'pictures'} - Page ${pageNumber} - Images ${count}/${page.totalPictures}`)
-    let pictures = page.pictures.filter(p => !idMap[p.id])
+    const pictures = page.pictures.filter(p => !idMap[p.id])
     if (fetchedAll && pictures.length === 0) {
       break
     }
-    for (let { picture, id } of pictures) {
+    for (const { picture, id } of pictures) {
       const result = await browser.fetch(`${domain}${picture}`)
       const $ = cheerio.load(result.body)
       const title = $('.boxheader .imageTitle').text().replace(/[/?<>\\:*|"^]/g, '-')
@@ -143,7 +143,7 @@ const runSync = async (db, logger) => {
   }
   logger('hentaifoundry synchronization begins')
   const watchers = (await db.select().from('hentaifoundrywatched').where({ active: 1 }))
-  for (let { user, fetchedAll } of watchers) {
+  for (const { user, fetchedAll } of watchers) {
     await downloadSection({ browser, user, db, logger, fetchedAll })
     await downloadSection({ browser, user, section: 'scraps', db, logger, fetchedAll })
     await db('hentaifoundrywatched').update({ fetchedAll: true }).where({ user: user })

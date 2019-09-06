@@ -37,7 +37,7 @@ const synchronizeDb = async (db, logger) => {
   await fswalker(config.imageRoot, async (items, pending) => {
     try {
       const chunks = chunk(items)
-      for (let chunk of chunks) {
+      for (const chunk of chunks) {
         await db('syncitems').insert(chunk.map(item => {
           if (item.isFile) {
             files++

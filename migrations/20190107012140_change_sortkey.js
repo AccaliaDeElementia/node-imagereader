@@ -8,11 +8,11 @@ function updateFolder (folder, knex, Promise, getSortKey) {
       const runPart = () => Promise.resolve()
         .then(() => {
           if (items.length > 0) {
-            let item = items.pop()
+            const item = items.pop()
             return knex('pictures')
               .where({ id: item.id })
               .update({
-                'sortKey': getSortKey(item)
+                sortKey: getSortKey(item)
               })
           }
           return Promise.resolve()
