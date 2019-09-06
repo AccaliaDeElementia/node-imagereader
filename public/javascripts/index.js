@@ -125,19 +125,23 @@ function Bookmarks () {
     $.post('/api/bookmarks/add', { path: $('#mainImage img').data('path') })
     $('#mainMenu').trigger('hideMenu')
   }).on('markAllSeen', () => {
-    $.ajax({
+    $('div.modal .btn-primary').on('click', () => $.ajax({
       method: 'POST',
       url: '/api/mark/read',
       data: { path: picturereaderdata.path },
       complete: () => window.location.reload(true)
-    })
+    }))
+    $('div.modal').on('hidden.bs.modal', () => $('div.modal .btn-primary').off('click'))
+    $('div.modal').modal('show')
   }).on('markAllUnseen', () => {
-    $.ajax({
+    $('div.modal .btn-primary').on('click', () => $.ajax({
       method: 'POST',
       url: '/api/mark/unread',
       data: { path: picturereaderdata.path },
       complete: () => window.location.reload(true)
-    })
+    }))
+    $('div.modal').on('hidden.bs.modal', () => $('div.modal .btn-primary').off('click'))
+    $('div.modal').modal('show')
   })
 }
 Bookmarks()

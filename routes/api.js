@@ -62,7 +62,7 @@ async function listing (db, folder, recurse = true) {
       })
     const firstImage = folderInfo.current ? folderInfo.current : counts.firstImage
     return {
-      path: toURI('/show' + folderInfo.path),
+      path: toURI('/show' + (folderInfo.path || '')),
       name: basename(path),
       parent: dirname(path + sep),
       percent: counts.totalSeen / counts.totalCount * 100,
