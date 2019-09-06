@@ -9,28 +9,30 @@
     "knex": "knex"
   },
   "dependencies": {
-    "cheerio": "^1.0.0-rc.2",
+    "cheerio": "^1.0.0-rc.3",
     "cookie-parser": "^1.4.4",
     "debug": "^4.1.1",
-    "express": "~4.16.4",
-    "fs-extra": "^7.0.1",
-    "http-errors": "~1.7.2",
-    "knex": "^0.16.3",
+    "express": "^4.17.1",
+    "fs-extra": "^8.1.0",
+    "http-errors": "^1.7.3",
+    "knex": "^0.19.3",
     "morgan": "~1.9.1",
+    "node-sass": "^4.12.0",
     "node-sass-middleware": "0.11.0",
-    "pg": "^7.9.0",
-    "pug": "^2.0.3",
+    "pg": "^7.12.1",
+    "pug": "^2.0.4",
     "request": "^2.88.0",
-    "sqlite3": "^4.0.6",
+    "sqlite3": "^4.1.0",
     "tough-cookie": "^3.0.1",
     "words-to-numbers": "^1.5.1"
   },
   "devDependencies": {
-    "eslint": "^5.15.2",
-    "eslint-config-standard": "^12.0.0",
-    "eslint-plugin-import": "^2.16.0",
-    "eslint-plugin-node": "^8.0.1",
-    "eslint-plugin-promise": "^4.0.1",
-    "eslint-plugin-standard": "^4.0.0"
+    "eslint": "^6.3.0",
+    "eslint-config-node": "^4.0.0",
+    "eslint-config-standard": "^14.1.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-node": "^9.2.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1"
   }
 }
