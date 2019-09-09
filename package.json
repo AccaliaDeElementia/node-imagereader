@@ -22,6 +22,7 @@
     "pg": "^7.12.1",
     "pug": "^2.0.4",
     "request": "^2.88.0",
+    "sharp": "^0.23.0",
     "sqlite3": "^4.1.0",
     "tough-cookie": "^3.0.1",
     "words-to-numbers": "^1.5.1"
