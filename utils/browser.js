@@ -33,6 +33,7 @@ class Browser {
       toughCookieJar = tough.CookieJar.fromJSON(jarfile)
     } catch (e) { }
     jar._jar = toughCookieJar
+    this.cookiejar = jar
     this.rawrequest = r.defaults({
       jar,
       headers: {
@@ -51,8 +52,15 @@ class Browser {
     return result
   }
 
-  async fetchCheerio (cfg) {
-    const result = await this.fetch(cfg)
+  async fetchCheerio (cfg, request = null) {
+
+    let result = null
+    if (request === null) {
+      result = await this.fetch(cfg)
+    } else {
+      result = await request(cfg)
+      await delay(500)
+    }
     return cheerio.load(result.body)
   }
 

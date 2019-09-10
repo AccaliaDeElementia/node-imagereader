@@ -10,6 +10,9 @@ const folderPrefix = 'furaffinity'
 const Browser = require('../utils/browser')
 const { toFolderName } = require('../utils/utils.js')
 
+const cloudscraper = require('cloudscraper')
+const cheerio = require('cheerio')
+
 const login = async () => {
   const browser = await new Browser(folderPrefix).prepare()
   let $ = await browser.fetchCheerio(`${domain}/login/?mode=imagecaptcha`)
@@ -115,7 +118,11 @@ const fetchGalleries = async ({ db, logger, browser, user, fetchedAll }) => {
 
 const runSync = async (db, logger) => {
   const browser = await new Browser(folderPrefix).prepare()
-  const $ = await browser.fetchCheerio(domain)
+  const $ = cheerio.load(await cloudscraper({
+    jar: browser.cookiejar,
+    uri: domain
+  }))
+  
   const username = $('#my-username').text().trim()
 
   if (!username) {
