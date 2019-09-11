@@ -52,20 +52,25 @@ function MainImage () {
       index = i
     }
   })
+  $('#mainImage img').on('load', ()=>$('#loadingScreen').hide())
   const loadImage = pic => {
     if (!pic) {
       return
     }
+    $('#loadingScreen').show()
     pic.seen = true
     $('title').text(picturereaderdata.name)
     $('nav .title').text(picturereaderdata.name)
     $('.status-bar .center').text(pic.name)
     $('.status-bar .left').text(`(${index + 1}/${picturereaderdata.pictures.length})`)
     $.post('/api/navigate/latest', { path: pic.path })
-    $('#mainImage img').attr('src', pic.path).data('path', pic.path).data('index', index)
+    $('#mainImage img').attr('src', `/images/${$('#mainImage').width()}-${$('#mainImage').height()}${pic.path}`).data('path', pic.path).data('index', index)
     after()
   }
   const changeImage = (isValid, action) => {
+    if ($('#loadingScreen:visible').length) {
+      return
+    }
     if (isValid) {
       action()
       loadImage(pics[index])

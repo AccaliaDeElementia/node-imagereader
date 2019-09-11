@@ -53,7 +53,6 @@ class Browser {
   }
 
   async fetchCheerio (cfg, request = null) {
-
     let result = null
     if (request === null) {
       result = await this.fetch(cfg)

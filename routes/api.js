@@ -68,7 +68,7 @@ async function listing (db, folder, recurse = true) {
       percent: counts.totalSeen / counts.totalCount * 100,
       imageCount: counts.totalCount,
       seenCount: counts.totalSeen,
-      current: firstImage ? toURI('/images' + firstImage) : null,
+      current: firstImage ? toURI(firstImage) : null,
       sortKey: folderInfo.sortKey
     }
   }
@@ -95,7 +95,7 @@ async function listing (db, folder, recurse = true) {
   const pictures = await db('pictures').select(['path', 'seen']).where({ folder }).orderBy('sortKey')
   pictures.forEach(picture => {
     picture.name = basename(picture.path, extname(picture.path))
-    picture.path = toURI('/images' + picture.path)
+    picture.path = toURI(picture.path)
   })
   result.folders = folders
   result.pictures = pictures
@@ -103,7 +103,7 @@ async function listing (db, folder, recurse = true) {
 }
 
 async function setLatest (db, path) {
-  path = fromURI(path).replace(/^\/images/, '')
+  path = fromURI(path)
   const folder = dirname(path) + sep
   await db('folders').update({ current: path }).where({ path: folder })
   await db('pictures').update({ seen: true }).where({ path })
@@ -115,7 +115,7 @@ async function getBookmarks (db, path = '/') {
   bookmarks = bookmarks.map(bookmark => {
     return {
       link: `/api/bookmarks/id/${bookmark.id}`,
-      path: toURI('/images' + bookmark.path),
+      path: toURI(bookmark.path),
       name: bookmark.name,
       folder: toURI(dirname(bookmark.path))
     }
@@ -138,7 +138,7 @@ async function getBookmarks (db, path = '/') {
 }
 
 async function addBookmark (db, path) {
-  path = path.replace(/^\/images/, '')
+  //path = path.replace(/^\/images/, '')
   path = fromURI(path)
   const bookmark = (await db('bookmarks').select('id').where({ path }))[0]
   if (!bookmark) {
@@ -173,7 +173,7 @@ module.exports = (db) => {
 
   router.get('/', async (_, res) => {
     const image = await db('pictures').select('path').orderBy(db.raw('RANDOM()')).limit(1)
-    res.render('index', { image: '/images' + image[0].path })
+    res.render('index', { image: image[0].path })
   })
   router.get('/listing/*', async (req, res) => {
     const folder = '/' + (req.params[0] || '')

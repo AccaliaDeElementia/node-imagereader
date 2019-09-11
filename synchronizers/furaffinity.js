@@ -122,9 +122,7 @@ const runSync = async (db, logger) => {
     jar: browser.cookiejar,
     uri: domain
   }))
-  
   const username = $('#my-username').text().trim()
-
   if (!username) {
     logger('No active login session! Aborting!')
     return false

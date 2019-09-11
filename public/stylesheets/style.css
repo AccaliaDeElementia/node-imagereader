@@ -19,6 +19,31 @@ nav.ease {
   height: 100%;
   object-fit: contain; }
 
+#loadingScreen {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #303030;
+  opacity: .9; }
+  #loadingScreen div.centerblock {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 300px;
+    height: 150px;
+    transform: translate(-50%, -50%);
+    padding: auto;
+    background-color: #808080;
+    border-radius: 20px;
+    opacity: 1; }
+    #loadingScreen div.centerblock div {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%); }
+
 @font-face {
   font-family: 'Material Icons';
   font-style: normal;

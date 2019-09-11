@@ -40,9 +40,11 @@ async function createRouters (app) {
   const indexRouter = require('./routes/index')(db)
   const apiRouter = api(db)
   const settingsRouter = require('./routes/settings')(db)
+  const imagesRouter = require('./routes/images')(db)
   app.use('/', indexRouter)
   app.use('/api', apiRouter)
   app.use('/settings', settingsRouter)
+  app.use('/images', imagesRouter)
   return app
 }
 
