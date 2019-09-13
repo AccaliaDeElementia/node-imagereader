@@ -17,7 +17,12 @@ module.exports = (db) => {
     }
   }
   const sendFile = (context) => {
-    context.res.set('Content-Type', `image/${context.ext}`).send(context.buffer)
+    const aMonth = 1000 * 60 * 60 * 24 * 30
+    context.res
+      .set('Content-Type', `image/${context.ext}`)
+      .set('Cache-Control', `public, max-age=${aMonth}`)
+      .set('Expires', new Date(Date.now() + aMonth).toUTCString())
+      .send(context.buffer)
     return context
   }
   const resizeFile = async (context) => {
