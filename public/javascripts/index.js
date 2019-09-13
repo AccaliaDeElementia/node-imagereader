@@ -52,7 +52,7 @@ function MainImage () {
       index = i
     }
   })
-  $('#mainImage img').on('load', ()=>$('#loadingScreen').hide())
+  $('#mainImage img').on('load', () => $('#loadingScreen').hide())
   const loadImage = pic => {
     if (!pic) {
       return

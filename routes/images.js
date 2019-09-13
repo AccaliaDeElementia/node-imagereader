@@ -35,8 +35,8 @@ module.exports = (db) => {
 
     if (context.ext !== 'gif' || context.preview) {
       let image = sharp(data)
-      let meta = await image.metadata()
-      if (meta.format === 'gif') {
+      const meta = await image.metadata()
+      if (meta.format === 'gif' && !context.preview) {
         context.buffer = data
         return context
       }

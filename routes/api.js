@@ -138,7 +138,6 @@ async function getBookmarks (db, path = '/') {
 }
 
 async function addBookmark (db, path) {
-  //path = path.replace(/^\/images/, '')
   path = fromURI(path)
   const bookmark = (await db('bookmarks').select('id').where({ path }))[0]
   if (!bookmark) {
