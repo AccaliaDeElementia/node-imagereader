@@ -30,6 +30,11 @@ module.exports = (db) => {
 
     if (context.ext !== 'gif' || context.preview) {
       let image = sharp(data)
+      let meta = await image.metadata()
+      if (meta.format === 'gif') {
+        context.buffer = data
+        return context
+      }
       if (+context.width || +context.height) {
         image = image.rotate().resize({
           width: +context.width || undefined,
