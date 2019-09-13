@@ -21,6 +21,11 @@ async function setupMiddleware () {
   app.set('views', path.join(__dirname, 'views'))
   app.set('view engine', 'pug')
 
+  app.get('/*', (_, res, next) => {
+    res.set('X-Clacks-Overhead', 'GNU Terry Pratchett')
+    next()
+  })
+
   app.use(logger('dev'))
   app.use(express.json())
   app.use(express.urlencoded({ extended: false }))
