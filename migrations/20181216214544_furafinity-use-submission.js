@@ -1,10 +1,10 @@
 
-exports.up = function (knex, Promise) {
+exports.up = function (knex) {
   return knex('furaffinitysync').update({
     submission: knex.raw('id')
   })
 }
 
-exports.down = function (knex, Promise) {
+exports.down = function (knex) {
 
 }

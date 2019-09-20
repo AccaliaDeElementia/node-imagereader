@@ -22,14 +22,14 @@ function updateFolder (folder, knex, Promise, getSortKey) {
     })
 }
 
-exports.up = function (knex, Promise) {
+exports.up = function (knex) {
   return Promise.all([
     updateFolder('pictures', knex, Promise, folder => toSortKey(basename(folder.path), 2)),
     updateFolder('folders', knex, Promise, folder => toSortKey(basename(folder.path), 2))
   ])
 }
 
-exports.down = function (knex, Promise) {
+exports.down = function (knex) {
   return Promise.all([
     updateFolder('pictures', knex, Promise, folder => toSortKey(basename(folder.path), 1)),
     updateFolder('folders', knex, Promise, folder => toSortKey(basename(folder.path), 1))

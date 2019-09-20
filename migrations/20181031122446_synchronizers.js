@@ -1,5 +1,5 @@
 
-exports.up = function (knex, Promise) {
+exports.up = function (knex) {
   return knex.schema.createTable('synchronizers', (table) => {
     table.increments('id').primary()
     table.string('name', 255)
@@ -15,6 +15,6 @@ exports.up = function (knex, Promise) {
   })
 }
 
-exports.down = function (knex, Promise) {
+exports.down = function (knex) {
   return knex.schema.dropTable('synchronizers')
 }

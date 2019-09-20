@@ -1,5 +1,5 @@
 
-exports.up = function (knex, Promise) {
+exports.up = function (knex) {
   return Promise.all([
     knex.schema.table('bookmarks', table => {
       table.string('name', 4096)
@@ -8,7 +8,7 @@ exports.up = function (knex, Promise) {
   ])
 }
 
-exports.down = function (knex, Promise) {
+exports.down = function (knex) {
   return Promise.all([
     knex.schema.table('bookmarks', table => {
       table.dropColumn('name')
