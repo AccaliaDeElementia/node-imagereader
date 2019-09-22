@@ -27,7 +27,7 @@ const computeHashes = async (pictures, db, logger) => {
       logger(`Failed to process ${pictures[i].path}`, e.message, e.stack)
       continue
     }
-    if (hashes.length >= 100) {
+    if (hashes.length >= 50) {
       await db('perceptualFingerprint').insert(hashes)
       hashes = []
     }
@@ -56,8 +56,10 @@ const compareNewHashes = async (db, logger) => {
         this.on('left.id', '=', 'perceptualComparison.left')
           .andOn('right.id', '=', 'perceptualComparison.right')
       })
-      .joinRaw('inner join hashPattern as hp1 on substr(??, 1, 4) = hp1.pattern and substr(??, 1, 4) = hp1.matches', ['left.hexHash', 'right.hexHash'])
-      .joinRaw('inner join hashPattern as hp2 on substr(??, 5, 4) = hp2.pattern and substr(??, 5, 4) = hp2.matches', ['left.hexHash', 'right.hexHash'])
+      .joinRaw('inner join hashPattern as hp1 on ?? = hp1.pattern and ?? = hp1.matches', ['left.hexHashA', 'right.hexHashA'])
+      .joinRaw('inner join hashPattern as hp2 on ?? = hp2.pattern and ?? = hp2.matches', ['left.hexHashB', 'right.hexHashB'])
+      .joinRaw('inner join hashPattern as hp3 on ?? = hp3.pattern and ?? = hp3.matches', ['left.hexHashC', 'right.hexHashC'])
+      .joinRaw('inner join hashPattern as hp4 on ?? = hp4.pattern and ?? = hp4.matches', ['left.hexHashD', 'right.hexHashD'])
       .whereRaw('left.id < right.id and perceptualComparison.id is null')
       .limit(5000)
     if (calculations.length === 0) {

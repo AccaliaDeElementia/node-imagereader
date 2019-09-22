@@ -21,6 +21,7 @@ class PerceptualHasher {
         [
           '-quiet',
           '-limit', 'memory', '4GiB',
+          '-limit', 'thread', '12',
           '-moments',
           filename,
           'json:-'
@@ -85,7 +86,10 @@ class PerceptualHasher {
         .concat(extractChannel(image.channelPerceptualHash.Channel2 || image.channelPerceptualHash.blueLuma)),
       filesize: image.filesize,
       elapsedTime,
-      hexHash
+      hexHashA: hexHash.substring(0, 4),
+      hexHashB: hexHash.substring(4, 8),
+      hexHashC: hexHash.substring(8, 12),
+      hexHashD: hexHash.substring(12, 16)
     }
   }
 
