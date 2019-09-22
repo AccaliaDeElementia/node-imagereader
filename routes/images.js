@@ -66,9 +66,9 @@ module.exports = (db) => {
   })
     .then(resizeFile)
     .then(sendFile))
-  router.get('/x-y/*', (req, res) => Promise.resolve({
-    width: 1920,
-    height: 1080,
+  router.get('/fullsize/*', (req, res) => Promise.resolve({
+    width: undefined,
+    height: undefined,
     filename: req.params[0] || '',
     req,
     res

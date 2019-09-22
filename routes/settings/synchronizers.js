@@ -5,12 +5,14 @@ const { Router } = require('express')
 const syncfolders = require('../../synchronizers/syncfolders')
 const synchentaifoundry = require('../../synchronizers/hentaifoundry')
 const syncfuraffinity = require('../../synchronizers/furaffinity')
+const findSimilarImages = require('../../synchronizers/similarImages')
 
 module.exports = db => {
   const syncs = [
     syncfolders,
     synchentaifoundry,
-    syncfuraffinity
+    syncfuraffinity,
+    findSimilarImages
   ]
 
   syncs.forEach(sync => sync.initialize(db))

@@ -1,0 +1,90 @@
+extends layout
+
+block centercontent
+  mixin ImageBlock(data, distance, title)
+    div.d-inline-block.w-50
+      div.image.d-block
+        a(href=data.fullsize target='_blank')
+          image.d-block.mx-auto(src=data.preview style=`width: ${preview.width}px; height: ${preview.height}px; object-fit: contain;`)
+      div.details
+        div 
+          b Name: 
+          span= data.name
+        div 
+          b Folder: 
+          span= data.folder
+        div 
+          b Format: 
+          span= data.format
+        div 
+          b Size: 
+          span= data.filesize
+        div 
+          b Dimensions: 
+          span= data.width
+          span x
+          span= data.height
+        div
+          if distance != null
+            b Perceptual Distance: 
+            span= distance
+          else 
+            span &nbsp;
+      div.resolution
+        button.btn.btn-danger.d-block.w-25.mx-auto.btn-delete-image(data-id=data.id)= `Delete ${title}`
+  h1 Similar Images
+  div.mt-2.mb-2
+    mixin Page(i)
+      li(class = `page-item ${i == page ? 'active':''}`)
+        a.page-link(href=`./${i}`)= i
+    mixin PageNavs()
+      nav
+        ul.pagination
+          - let i = 1
+          - if (page - 3 > 0)
+            - for (; i <= Math.min(page - 3, 5); i++)
+              +Page(i)
+          - if (page - 3 > i) 
+            li.page-item 
+              a.page-link.disabled ...
+          - for (i = Math.max(1, page - 3); i <= Math.min(page + 3, pages); i++)
+              +Page(i)
+          - if (i < pages - 5)
+            li.page-item 
+              a.page-link.disabled ...
+          - for (i = Math.max(i, pages - 5); i <= pages; i++)
+              +Page(i)
+    div
+      +PageNavs()
+    div
+      ul.list-group
+        each image in images
+          li.list-group-item
+            div.images
+              +ImageBlock(image.left, image.distance, 'Left')
+              +ImageBlock(image.right, null, 'Right')
+              div.resolutions
+                  button.btn.btn-primary.d-block.w-25.mx-auto.btn-false-positive(data-id=image.id) Mark False Positive
+    div
+      +PageNavs()
+  script.
+    $('.btn-delete-image').click(function () {
+      const id = $(this).data('id')
+      $('div.modal .btn-primary').on('click', () => $.ajax({
+        method: 'DELETE',
+        url: '/settings/similarImages/delete/' + id,
+        complete: () => window.location.reload(true)
+      }))
+      $('div.modal').on('hidden.bs.modal', () => $('div.modal .btn-primary').off('click'))
+      $('div.modal').modal('show')
+    })
+    $('.btn-false-positive').click(function () {
+      const id = $(this).data('id')
+      $('div.modal .btn-primary').on('click', () => $.ajax({
+        method: 'POST',
+        url: '/settings/similarImages/falsePositive/' + id,
+        complete: () => window.location.reload(true)
+      }))
+      $('div.modal').on('hidden.bs.modal', () => $('div.modal .btn-primary').off('click'))
+      $('div.modal').modal('show')
+    })
