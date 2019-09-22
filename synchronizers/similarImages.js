@@ -43,24 +43,24 @@ const compareNewHashes = async (db, logger) => {
   let page = 0
   while (true) {
     const calculations = await db({
-      left: 'perceptualFingerprint',
-      right: 'perceptualFingerprint'
+      leftPrint: 'perceptualFingerprint',
+      rightPrint: 'perceptualFingerprint'
     })
       .select([
-        'left.id as leftid',
-        'right.id as rightid',
-        'left.hash as lefthash',
-        'right.hash as righthash'
+        'leftPrint.id as leftid',
+        'rightPrint.id as rightid',
+        'leftPrint.hash as lefthash',
+        'rightPrint.hash as righthash'
       ])
       .leftJoin('perceptualComparison', function () {
-        this.on('left.id', '=', 'perceptualComparison.left')
-          .andOn('right.id', '=', 'perceptualComparison.right')
+        this.on('leftPrint.id', '=', 'perceptualComparison.left')
+          .andOn('rightPrint.id', '=', 'perceptualComparison.right')
       })
-      .joinRaw('inner join hashPattern as hp1 on ?? = hp1.pattern and ?? = hp1.matches', ['left.hexHashA', 'right.hexHashA'])
-      .joinRaw('inner join hashPattern as hp2 on ?? = hp2.pattern and ?? = hp2.matches', ['left.hexHashB', 'right.hexHashB'])
-      .joinRaw('inner join hashPattern as hp3 on ?? = hp3.pattern and ?? = hp3.matches', ['left.hexHashC', 'right.hexHashC'])
-      .joinRaw('inner join hashPattern as hp4 on ?? = hp4.pattern and ?? = hp4.matches', ['left.hexHashD', 'right.hexHashD'])
-      .whereRaw('left.id < right.id and perceptualComparison.id is null')
+      .joinRaw('inner join hashPattern as hp1 on ?? = hp1.pattern and ?? = hp1.matches', ['leftPrint.hexHashA', 'rightPrint.hexHashA'])
+      .joinRaw('inner join hashPattern as hp2 on ?? = hp2.pattern and ?? = hp2.matches', ['leftPrint.hexHashB', 'rightPrint.hexHashB'])
+      .joinRaw('inner join hashPattern as hp3 on ?? = hp3.pattern and ?? = hp3.matches', ['leftPrint.hexHashC', 'rightPrint.hexHashC'])
+      .joinRaw('inner join hashPattern as hp4 on ?? = hp4.pattern and ?? = hp4.matches', ['leftPrint.hexHashD', 'rightPrint.hexHashD'])
+      .whereRaw('leftPrint.id < rightPrint.id and perceptualComparison.id is null')
       .limit(5000)
     if (calculations.length === 0) {
       break
