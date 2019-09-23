@@ -8,6 +8,7 @@ const fetchImages = async (db, logger) => {
     .select(['pictures.id', 'pictures.path'])
     .leftJoin('perceptualFingerprint', 'pictures.id', 'perceptualFingerprint.picture')
     .whereNull('perceptualFingerprint.id')
+    .orderBy('pictures.path')
     .limit(1000)
   logger(`Found ${pictures.length} images to process...`)
   return pictures
