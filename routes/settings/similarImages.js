@@ -39,7 +39,7 @@ const getImages = async (db, width, height, page = 1, perPage = 10) => (await db
     this.on('rightImage.id', '=', 'rightFingerprint.picture')
   })
   .where('perceptualComparison.falsePositive', '=', false)
-  .orderBy('perceptualComparison.distance')
+  .orderBy('perceptualComparison.distance', 'perceptualComparison.id')
   .offset((page - 1) * perPage)
   .limit(perPage))
   .map(entry => {
@@ -81,7 +81,7 @@ module.exports = db => {
   router.get('/page/:page', async (req, res) => {
     const width = 500
     const height = 400
-    const pages = Math.ceil((await db('perceptualComparison').where('distance', '<', 5).count('* as total'))[0].total / 10)
+    const pages = Math.ceil((await db('perceptualComparison').where('distance', '<', 5.0).count('* as total'))[0].total / 10)
     const page = Math.min(Math.max(1, +req.params.page), pages)
     if (`${page}` != req.params.page){
       return res.redirect(`${req.baseUrl}/page/${page}`)
