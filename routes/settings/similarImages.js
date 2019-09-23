@@ -14,11 +14,11 @@ const getImages = async (db, width, height, page = 1, perPage = 10) => (await db
     'leftFingerprint.width as leftWidth',
     'leftFingerprint.height as leftHeight',
     'leftFingerprint.format as leftFormat',
-    'leftFingerprint.fileSize as leftFilesize',
+    'leftFingerprint.filesize as leftFilesize',
     'rightFingerprint.width as rightWidth',
     'rightFingerprint.height as rightHeight',
     'rightFingerprint.format as rightFormat',
-    'rightFingerprint.fileSize as rightFilesize',
+    'rightFingerprint.filesize as rightFilesize',
     'leftImage.path as leftImagePath',
     'leftImage.seen as leftImageSeen',
     'leftImage.id as leftId',
@@ -26,12 +26,19 @@ const getImages = async (db, width, height, page = 1, perPage = 10) => (await db
     'rightImage.seen as rightImageSeen',
     'rightImage.id as rightId'
   ])
-  .joinRaw('join perceptualFingerprint as leftFingerprint on leftFingerprint.id = perceptualComparison.left')
-  .joinRaw('join perceptualFingerprint as rightFingerprint on rightFingerprint.id = perceptualComparison.right')
-  .joinRaw('join pictures as leftImage on leftImage.id = leftFingerprint.picture')
-  .joinRaw('join pictures as rightImage on rightImage.id = rightFingerprint.picture')
+  .join('perceptualFingerprint as leftFingerprint', function() {
+    this.on('leftFingerprint.id', '=', 'perceptualComparison.left')
+  })
+  .join('perceptualFingerprint as rightFingerprint', function() {
+    this.on('rightFingerprint.id', '=', 'perceptualComparison.right')
+  })
+  .join('pictures as leftImage', function() {
+    this.on('leftImage.id', '=', 'leftFingerprint.picture')
+  })
+  .join('pictures as rightImage', function() {
+    this.on('rightImage.id', '=', 'rightFingerprint.picture')
+  })
   .where('perceptualComparison.falsePositive', '=', false)
-  // .andWhere('perceptualComparison.distance', '<', 5)
   .orderBy('perceptualComparison.distance')
   .offset((page - 1) * perPage)
   .limit(perPage))
