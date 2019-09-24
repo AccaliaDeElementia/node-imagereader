@@ -1,5 +1,5 @@
 
-exports.up = function(knex) {
+exports.up = function (knex) {
   return knex('perceptualFingerprint').delete()
     .then(() => knex('perceptualComparison').delete())
     .then(() => knex.schema.alterTable('perceptualFingerprint', table => {
@@ -9,9 +9,9 @@ exports.up = function(knex) {
       table.string('hexHashC', 4)
       table.string('hexHashD', 4)
     }))
-};
+}
 
-exports.down = function(knex) {
+exports.down = function (knex) {
   return knex('perceptualFingerprint').delete()
     .then(() => knex('perceptualComparison').delete())
     .then(() => knex.schema.alterTable('perceptualFingerprint', table => {
@@ -21,4 +21,4 @@ exports.down = function(knex) {
       table.dropColumn('hexHashC')
       table.dropColumn('hexHashD')
     }))
-};
+}

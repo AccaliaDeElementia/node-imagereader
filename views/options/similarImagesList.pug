@@ -9,7 +9,7 @@ block centercontent
       div.details
         div 
           b Name: 
-          span= data.name
+          a(href=`../id/${data.id}`)= data.name
         div 
           b Folder: 
           span= data.folder

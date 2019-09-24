@@ -63,10 +63,10 @@ const compareNewHashes = async (db, logger) => {
         this.on('leftPrint.hexHashD', '=', 'hp4.pattern')
       })
       .join('perceptualFingerprint as rightPrint', function () {
-        this.on('rightPrint.hexHashA', '=','hp1.matches')
-          .andOn('rightPrint.hexHashB', '=','hp2.matches')
-          .andOn('rightPrint.hexHashC', '=','hp3.matches')
-          .andOn('rightPrint.hexHashD', '=','hp4.matches')
+        this.on('rightPrint.hexHashA', '=', 'hp1.matches')
+          .andOn('rightPrint.hexHashB', '=', 'hp2.matches')
+          .andOn('rightPrint.hexHashC', '=', 'hp3.matches')
+          .andOn('rightPrint.hexHashD', '=', 'hp4.matches')
       })
       .leftJoin('perceptualComparison', function () {
         this.on('leftPrint.id', '=', 'perceptualComparison.left')
