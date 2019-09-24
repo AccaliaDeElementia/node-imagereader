@@ -50,23 +50,22 @@ const compareNewHashes = async (db, logger) => {
         'leftPrint.hash as lefthash',
         'rightPrint.hash as righthash'
       ])
-      .join('perceptualFingerprint as rightPrint', function () {
-        this.on(1, '=', 1)
-      })
       .join('hashPattern as hp1', function () {
         this.on('leftPrint.hexHashA', '=', 'hp1.pattern')
-          .andOn('rightPrint.hexHashA', '=','hp1.matches')
       })
       .join('hashPattern as hp2', function () {
         this.on('leftPrint.hexHashB', '=', 'hp2.pattern')
-          .andOn('rightPrint.hexHashB', '=','hp2.matches')
       })
       .join('hashPattern as hp3', function () {
         this.on('leftPrint.hexHashC', '=', 'hp3.pattern')
-          .andOn('rightPrint.hexHashC', '=','hp3.matches')
       })
       .join('hashPattern as hp4', function () {
         this.on('leftPrint.hexHashD', '=', 'hp4.pattern')
+      })
+      .join('perceptualFingerprint as rightPrint', function () {
+        this.on('rightPrint.hexHashA', '=','hp1.matches')
+          .andOn('rightPrint.hexHashB', '=','hp2.matches')
+          .andOn('rightPrint.hexHashC', '=','hp3.matches')
           .andOn('rightPrint.hexHashD', '=','hp4.matches')
       })
       .leftJoin('perceptualComparison', function () {
