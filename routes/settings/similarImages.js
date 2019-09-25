@@ -134,6 +134,7 @@ module.exports = db => {
       .concat(await db('perceptualComparison')
         .select([
           'perceptualComparison.id as comparisonId',
+          'perceptualComparison.distance',
           'perceptualFingerprint.width',
           'perceptualFingerprint.height',
           'perceptualFingerprint.format',
