@@ -5,8 +5,16 @@ const { unlink } = require('fs-extra')
 
 const config = require('../../utils/config')
 
+const preview = {
+  width: 500,
+  height: 400
+}
+const similarityCutoff = 5.0
+const pageSize = 10
+
 const toUri = uri => uri.split('/').map(encodeURIComponent).join('/')
-const getImages = async (db, width, height, page = 1, perPage = 10) => (await db('perceptualComparison')
+
+const getImages = async (db, page = 1) => (await db('perceptualComparison')
   .select([
     'perceptualComparison.id as id',
     'perceptualComparison.distance as perceptualDistance',
@@ -31,15 +39,15 @@ const getImages = async (db, width, height, page = 1, perPage = 10) => (await db
   .join('pictures as rightImage', 'rightImage.id', 'rightFingerprint.picture')
   .where('perceptualComparison.falsePositive', '=', false)
   .orderBy('perceptualComparison.distance', 'perceptualComparison.id')
-  .offset((page - 1) * perPage)
-  .limit(perPage))
+  .offset((page - 1) * pageSize)
+  .limit(pageSize))
   .map(entry => {
     return {
       id: entry.id,
       distance: entry.perceptualDistance,
       left: {
         id: entry.leftId,
-        preview: join(`/images/${width}-${height}`, toUri(entry.leftImagePath)),
+        preview: join(`/images/${preview.width}-${preview.height}`, toUri(entry.leftImagePath)),
         fullsize: join('/images/fullsize', toUri(entry.leftImagePath)),
         name: basename(entry.leftImagePath),
         folder: dirname(entry.leftImagePath),
@@ -50,7 +58,7 @@ const getImages = async (db, width, height, page = 1, perPage = 10) => (await db
       },
       right: {
         id: entry.rightId,
-        preview: join(`/images/${width}-${height}`, toUri(entry.rightImagePath)),
+        preview: join(`/images/${preview.width}-${preview.height}`, toUri(entry.rightImagePath)),
         fullsize: join('/images/fullsize', toUri(entry.rightImagePath)),
         name: basename(entry.rightImagePath),
         folder: dirname(entry.rightImagePath),
@@ -70,26 +78,21 @@ module.exports = db => {
     res.redirect(req.baseUrl + '/page/1')
   })
   router.get('/page/:page', async (req, res) => {
-    const width = 500
-    const height = 400
     const pages = Math.ceil((await db('perceptualComparison')
-      .where('distance', '<', 5.0)
+      .where('distance', '<', similarityCutoff)
       .andWhere('falsePositive', '=', false)
-      .count('* as total'))[0].total / 10)
+      .count('* as total'))[0].total / pageSize)
     const page = Math.min(Math.max(1, +req.params.page), pages)
     if (`${page}` !== req.params.page) {
       return res.redirect(`${req.baseUrl}/page/${page}`)
     }
-    const images = await getImages(db, width, height, page)
+    const images = await getImages(db, page)
     res.render('options/similarImagesList', {
       images,
       title,
       page,
       pages,
-      preview: {
-        width,
-        height
-      }
+      preview
     })
   })
   router.get('/id/:id', async (req, res) => {
@@ -125,7 +128,9 @@ module.exports = db => {
       .join('perceptualFingerprint', 'perceptualFingerprint.id', 'perceptualComparison.right')
       .join('pictures', 'pictures.id', 'perceptualFingerprint.picture')
       .where('perceptualComparison.left', '=', data.id)
-      .andWhere('perceptualComparison.falsePositive', '=', false))
+      .andWhere('perceptualComparison.falsePositive', '=', false)
+      .andWhere('perceptualComparison.distance', '<', similarityCutoff)
+      .orderBy(['perceptualComparison.distance', 'pictures.path']))
       .concat(await db('perceptualComparison')
         .select([
           'perceptualComparison.id as comparisonId',
@@ -140,13 +145,15 @@ module.exports = db => {
         .join('perceptualFingerprint', 'perceptualFingerprint.id', 'perceptualComparison.left')
         .join('pictures', 'pictures.id', 'perceptualFingerprint.picture')
         .where('perceptualComparison.right', '=', data.id)
-        .andWhere('perceptualComparison.falsePositive', '=', false))
+        .andWhere('perceptualComparison.falsePositive', '=', false)
+        .andWhere('perceptualComparison.distance', '<', similarityCutoff)
+        .orderBy(['perceptualComparison.distance', 'pictures.path']))
       .map(entry => {
         return {
           id: entry.comparisonId,
           picture: entry.pictureId,
           distance: entry.distance,
-          preview: join('/images/preview', toUri(entry.path)),
+          preview: join(`/images/${preview.width}-${preview.height}`, toUri(entry.path)),
           fullsize: join('/images/fullsize', toUri(entry.path)),
           name: basename(entry.path),
           folder: dirname(entry.path),
@@ -156,16 +163,10 @@ module.exports = db => {
           format: entry.format
         }
       })
-    const width = 500
-    const height = 400
-
     res.render('options/similarImagesDetails', {
       data,
       title,
-      preview: {
-        width,
-        height
-      }
+      preview
     })
   })
   router.post('/deleteImages', async (req, res) => {
