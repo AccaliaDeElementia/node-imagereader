@@ -41,12 +41,14 @@ class PerceptualHasher {
             stdout = '[' +
               stdout
                 .replace(/␍/gm, '') // We can get embedded carriage return symbols.... why?!
-                .trim() // There/s extra whitespace which makes the regexes harder. let's get rid of it.
+                .replace(/^\s+$/gm,'') // There/s extra whitespace which makes the regexes harder. let's get rid of it.
+                .replace(/\n\n/gm, '\n')
                 .replace(/\b(nan)\b/g, 'null') // (nan) isn't valid in JSON. Null out those fields instead
                 .replace(/\s(\+\d+\+\d+)$/gm, '"$1"') // what the even is this!? that's not how you represent strings!
                 .replace(/([^,}\][{])($|\n)/g, '$1,$2') // Insert missing commas
                 .replace(/,((\s)*[\]}])/g, '$1') // Remove the extra commas at end of arrays/objects we added (TODO: figure out how to not add these in the first place)
-                .replace(/^\}\n/gm, '}, \n') + // Add commas between objects (handles gifs which have multiple frames)
+                .replace(/^\}\n/gm, '}, \n') // Add commas between objects (handles gifs which have multiple frames)
+                .replace(/, \n,/gm, '') +
               ']'
             return resolve(JSON.parse(stdout))
           } catch (e) {
