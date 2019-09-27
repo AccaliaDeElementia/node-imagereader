@@ -62,7 +62,7 @@ module.exports = db => {
     sync.data.runImmediately = req.body.syncRunImmediately === 'on'
     sync.data.useJitter = req.body.syncJitter === 'on'
     sync.data.jitterFactor = +req.body.syncJitterFactor / 100
-    sync.data.runInterval = req.body.runInterval
+    sync.data.runInterval = +req.body.syncRunInterval
     await sync.save(db)
     res.redirect(`./${req.body.id}`)
   })
