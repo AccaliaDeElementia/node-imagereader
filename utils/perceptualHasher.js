@@ -37,7 +37,7 @@ class PerceptualHasher {
         stderr += data
       })
       ps.on('close', code => {
-        if (code === 0) {
+        if (stdout.length > 0) {
           try {
             // Fun fact. Imagemagick doesn't produce valid json for all file types... Let's clean that up shall we?
             stdout = '[' +
@@ -51,11 +51,14 @@ class PerceptualHasher {
               ']'
             return resolve(JSON5.parse(stdout))
           } catch (e) {
-            console.log(filename)
-            reject(e)
+            if (code === 0) {
+              reject(e)
+            } else {
+              reject(new Error(stderr))
+            }
           }
         }
-        reject(new Error(stderr))
+        reject(new Error(stderr || 'No Ouptut Detected'))
       })
     })
   }
