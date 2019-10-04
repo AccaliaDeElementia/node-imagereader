@@ -63,4 +63,4 @@ typings/
 dev.sqlite3
 dev.sqlite3-journal
 
-test.js
+test.*
