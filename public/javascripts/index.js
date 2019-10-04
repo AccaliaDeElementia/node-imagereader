@@ -113,7 +113,9 @@ function MainImage () {
     }
   }).on('loadIndex', (_, i) => changeImage(true, () => {
     index = +i
-  }))
+  })).on('viewFullSize', () => {
+    window.open(`/images/fullsize/${pics[index].path}`, '_blank').focus()
+  })
 }
 MainImage()
 
