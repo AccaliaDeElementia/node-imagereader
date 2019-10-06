@@ -38,7 +38,7 @@ const getImages = async (db, page = 1) => (await db('perceptualComparison')
   .join('pictures as leftImage', 'leftImage.id', 'leftFingerprint.picture')
   .join('pictures as rightImage', 'rightImage.id', 'rightFingerprint.picture')
   .where('perceptualComparison.falsePositive', '=', false)
-  .orderBy('perceptualComparison.distance', 'perceptualComparison.id')
+  .orderBy(['perceptualComparison.distance', 'perceptualComparison.id'])
   .offset((page - 1) * pageSize)
   .limit(pageSize))
   .map(entry => {
