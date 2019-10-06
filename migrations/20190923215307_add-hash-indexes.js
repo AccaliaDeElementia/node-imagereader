@@ -1,10 +1,7 @@
 
 exports.up = function (knex) {
   return knex.schema.alterTable('perceptualFingerprint', table => {
-    table.index('hexHashA')
-    table.index('hexHashB')
-    table.index('hexHashC')
-    table.index('hexHashD')
+    ['hexHashA', 'hexHashB', 'hexHashC', 'hexHashD'].forEach(i => table.index(i))
   })
     .then(() => knex.schema.alterTable('hashPattern', table => {
       table.index('pattern')
@@ -13,10 +10,7 @@ exports.up = function (knex) {
 
 exports.down = function (knex) {
   return knex.schema.alterTable('perceptualFingerprint', table => {
-    table.dropIndex('hexHashA')
-    table.dropIndex('hexHashB')
-    table.dropIndex('hexHashC')
-    table.dropIndex('hexHashD')
+    ['hexHashA', 'hexHashB', 'hexHashC', 'hexHashD'].forEach(i => table.dropIndex(i))
   })
     .then(() => knex.schema.alterTable('hashPattern', table => {
       table.dropIndex('pattern')
