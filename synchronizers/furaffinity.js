@@ -51,13 +51,13 @@ const login = async () => {
 
 const fetchImage = async ({ browser, logger, user, id }) => {
   const $ = await browser.fetchCheerio(`${domain}/view/${id}`)
-  const folder = $('.folder-list-container ul li:first-of-type a *').map((_, e) => $(e).text().trim()).get().join('/')
+  const folder = $('.folder-list-container div:first-of-type a *').map((_, e) => $(e).text().trim()).get().join('/')
   const imageSrc = $('#submissionImg').data('fullview-src')
   if (!imageSrc) {
     return
   }
   const imageUri = 'https:' + imageSrc
-  const title = $('th.cat').text().trim()
+  const title = $('.submission-title').text().trim()
   let extension = 'png'
   try {
     extension = /[.]([^.]+)$/.exec(imageUri)[1]
@@ -96,7 +96,7 @@ const fetchGallery = async ({ db, browser, logger, user, fetchedAll, prefix, uri
       }
       ids[id] = true
     }
-    uri = $('.fancy-pagination .button-link.right').attr('href')
+    uri = $('form:has(button:contains(Next))').attr('action')
     i++
   }
 }
