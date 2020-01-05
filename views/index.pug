@@ -2,7 +2,10 @@ extends layout
 
 
 block navigation
-  div.d-inline-block.mr-auto.ml-auto.title= data.name
+  div.d-inline-block.mr-auto.ml-auto
+    span.title= data.name
+    span.has_description
+      i.material-icons book
   div.d-inline-block
     input(type='checkbox' data-toggle='toggle' data-on='View Unseen' data-off='View All' name='ShowUnseenOnly', data-offstyle='success', data-onstyle='info')
     button.btn#mainMenuItem
@@ -21,6 +24,8 @@ block content
         li.nav-item
           a.nav-link.active#actions-tab(data-toggle="tab" href="#actions" role="tab") Actions
         li.nav-item
+          a.nav-link#navigation-tab(data-toggle="tab" href="#navigation" role="tab") Navigation
+        li.nav-item
           a.nav-link#pictures-tab(data-toggle="tab" href="#pictures" role="tab") Pictures
         li.nav-item
           a.nav-link#bookmarks-tab(data-toggle="tab" href="#bookmarks" role="tab") Bookmarks
@@ -28,7 +33,7 @@ block content
           a.nav-link#settings-tab(href="/settings" role="tab") Settings
     div.menu-block
       div.tab-content
-        div.tab-pane.active.action-block#actions(role="tabpanel")
+        mixin actionSection
           - 
             const actionRows = [
               [
@@ -92,6 +97,14 @@ block content
                     i.material-icons= action.image
                   div.card-body
                     h5.card-title.text-center= action.name
+        div.tab-pane.active.action-block#actions(role="tabpanel")
+          +actionSection
+          div.description-section
+            div.description-title
+              h2.title
+            div.description
+        div.tab-pane.action-block#navigation(role="tabpanel")
+          +actionSection
           div#folders
             if data.folders.incomplete.length > 0 || data.folders.complete.length > 0
               h3 Folders

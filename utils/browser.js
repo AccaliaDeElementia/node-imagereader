@@ -77,5 +77,15 @@ class Browser {
     await fse.writeJSON(this.__cookieFile, await this.__serializeCookies())
     await delay(500)
   }
+
+  async saveText (data, dest) {
+    let reldest = join(this.folderPrefix, dest)
+    reldest = reldest.split('/').map(toFolderName).join('/')
+    dest = join(config.imageRoot, reldest)
+    await fse.mkdirp(dirname(dest))
+    await fse.writeFile(dest, data)
+    await fse.writeJSON(this.__cookieFile, await this.__serializeCookies())
+    await delay(500)
+  }
 }
 module.exports = Browser

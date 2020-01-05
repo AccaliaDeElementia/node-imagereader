@@ -66,6 +66,10 @@ const fetchImage = async ({ browser, logger, user, id }) => {
   const dest = `${user}/${folder}/${filename}`.replace(/\/\/+/g, '/')
   logger(`${user} - ${title}`)
   await browser.download(imageUri, dest)
+  const description = $('.submission-description').html()
+  if (description && description.length > 0) {
+    await browser.saveText(`<div>\n${description}\n</div>`, `${dest}.txt`)
+  }
 }
 
 const fetchGallery = async ({ db, browser, logger, user, fetchedAll, prefix, uri, ids }) => {

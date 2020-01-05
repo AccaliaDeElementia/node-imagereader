@@ -114,6 +114,10 @@ const downloadSection = async ({ browser, user, section = '', db, pageLimit = In
       const ext = (/[.]([^.]+)$/.exec(link) || [null, 'jpg'])[1]
       const dest = join(user, `${toFolderName(title)} - ${id}.${ext}`)
       await browser.download(link, dest)
+      const description = $('.picDescript').html()
+      if (description && description.length > 0) {
+        await browser.saveText(`<div>\n${description}\n</div>`, `${dest}.txt`)
+      }
       for (let i = 1; i <= 5; i++) {
         try {
           await db.insert({ id, user, fetched: true }).into('hentaifoundrysync')

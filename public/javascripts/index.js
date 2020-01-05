@@ -59,13 +59,31 @@ function MainImage () {
     }
     $('#loadingScreen').show()
     pic.seen = true
-    $('title').text(picturereaderdata.name)
-    $('nav .title').text(picturereaderdata.name)
-    $('.status-bar .center').text(pic.name)
+    $('title, nav .title').text(picturereaderdata.name)
+    $('.status-bar .center, .description-title .title').text(pic.name)
     $('.status-bar .left').text(`(${index + 1}/${picturereaderdata.pictures.length})`)
     $.post('/api/navigate/latest', { path: pic.path })
     $('#mainImage img').attr('src', `/images/${$('#mainImage').width()}-${$('#mainImage').height()}${pic.path}`).data('path', pic.path).data('index', index)
     after()
+  }
+  const loadDescription = pic => {
+    if (!pic || !pic.path){
+      $('.menu-block .description').empty()
+      $('#navigation-tab').tab('show')
+      $('.has_description').hide()
+      return
+    }
+    $.get(`/api/description${pic.path}`, (description) => {
+      const node = $.parseHTML(description)
+      $('.menu-block .description').empty().append(node)
+      if (description && description.length > 0) {
+        $('#actions-tab').tab('show')
+        $('.has_description').show()
+      } else {
+        $('#navigation-tab').tab('show')
+        $('.has_description').hide()
+      }
+    })
   }
   const changeImage = (isValid, action) => {
     if ($('#loadingScreen:visible').length) {
@@ -74,11 +92,13 @@ function MainImage () {
     if (isValid) {
       action()
       loadImage(pics[index])
+      loadDescription(pics[index])
     } else {
       $('#mainImage').trigger('error')
     }
   }
   loadImage(pics[index])
+  loadDescription(pics[index])
   $('body').on('random', () => changeImage(true, () => {
     index = Math.floor(Math.random() * pics.length)
   })).on('first', () => changeImage(index > 0, () => {

@@ -1,7 +1,10 @@
 const express = require('express')
 
-const { posix: { dirname, basename, extname, sep } } = require('path')
+const { posix: { dirname, basename, extname, sep }, normalize, join } = require('path')
 
+const { readFile } = require('fs-extra')
+
+const config = require('../utils/config')
 const { toSortKey } = require('../utils/utils')
 
 const toURI = uri => uri.split('/').map(encodeURIComponent).join('/')
@@ -177,6 +180,19 @@ module.exports = (db) => {
   router.get('/listing/*', async (req, res) => {
     const folder = '/' + (req.params[0] || '')
     res.json(await listing(db, folder))
+  })
+  router.get('/description/*', async (req, res) => {
+    const image = '/' + (req.params[0] || '')
+    if (image !== normalize(image)) {
+      throw new ExpressError('Directory traversal iis not allowed', 403)
+    }
+    try {
+      const data = await readFile(join(config.imageRoot, `${image}.txt`))
+      res.send(data)
+    } catch (e) {
+      console.error(e)
+      res.send('')
+    }    
   })
   router.post('/navigate/latest', async (req, res) => {
     await setLatest(db, req.body.path)
