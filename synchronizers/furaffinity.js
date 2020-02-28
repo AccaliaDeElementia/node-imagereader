@@ -52,7 +52,7 @@ const login = async () => {
 const fetchImage = async ({ browser, logger, user, id }) => {
   const $ = cheerio.load(await cloudscraper({
     jar: browser.cookiejar,
-    uri: domain
+    uri: `${domain}/view/${id}`
   }))
   const folder = $('.folder-list-container div:first-of-type a *').map((_, e) => $(e).text().trim()).get().join('/')
   const imageSrc = $('#submissionImg').data('fullview-src')
