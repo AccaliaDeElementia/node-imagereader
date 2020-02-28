@@ -67,7 +67,7 @@ const fetchImage = async ({ browser, logger, user, id }) => {
   } catch (e) { }
   const filename = `${toFolderName(title)} - ${id}.${extension}`
   const dest = `${user}/${folder}/${filename}`.replace(/\/\/+/g, '/')
-  logger(`${user} - ${title}`)
+  logger(`${user}- ${folder} - ${title}`)
   await browser.download(imageUri, dest)
   const description = $('.submission-description').html()
   if (description && description.length > 0) {
@@ -81,7 +81,7 @@ const fetchGallery = async ({ db, browser, logger, user, fetchedAll, prefix, uri
     logger(`${prefix} - Page ${i}`)
     const $ = cheerio.load(await cloudscraper({
       jar: browser.cookiejar,
-      uri: domain
+      uri: domain + uri
     }))
     const submissions = []
     $('.gallery .t-image b u a').each((_, elem) => {
