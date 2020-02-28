@@ -207,33 +207,25 @@ function Navigation () {
     }
   })
   document.onkeyup = (evt) => {
+    let keys = {
+      'ARROWUP': () => $('#mainMenu').trigger('showMenu'),
+      'ARROWDOWN': () => $('#mainMenu').trigger('hideMenu'),
+      'ARROWRIGHT': () => $('#mainImage').trigger('next'),
+      'ARROWLEFT': () => $('#mainImage').trigger('previous'),
+      'HOME': () => $('#mainImage').trigger('first'),
+      'END': () => $('#mainImage').trigger('last')
+    }
     if ($('#mainMenu').is(':visible')) {
-      return
+      keys = {
+        'ARROWDOWN': () => $('#mainMenu').trigger('hideMenu'),
+      }
     }
     var key = (evt.ctrlKey ? '<CTRL>' : '') +
         (evt.altKey ? '<ALT>' : '') +
         (evt.shiftKey ? '<SHIFT>' : '') +
         evt.key.toUpperCase()
-    switch (key) {
-      case 'ARROWUP':
-        $('#mainMenu').trigger('showMenu')
-        break
-      case 'ARROWDOWN':
-        $('#mainMenu').trigger('hideMenu')
-        break
-      case 'ARROWRIGHT':
-        $('#mainImage').trigger('next')
-        break
-      case 'ARROWLEFT':
-        $('#mainImage').trigger('previous')
-        break
-      case 'HOME':
-        $('#mainImage').trigger('first')
-        break
-      case 'END':
-        $('#mainImage').trigger('last')
-        break
-    }
+    const action = keys[key] || (() => true)
+    action()
   }
 
   const limit = Math.tan(45 * 1.5 / 180 * Math.PI)

@@ -50,7 +50,10 @@ const login = async () => {
 }
 
 const fetchImage = async ({ browser, logger, user, id }) => {
-  const $ = await browser.fetchCheerio(`${domain}/view/${id}`)
+  const $ = cheerio.load(await cloudscraper({
+    jar: browser.cookiejar,
+    uri: domain
+  }))
   const folder = $('.folder-list-container div:first-of-type a *').map((_, e) => $(e).text().trim()).get().join('/')
   const imageSrc = $('#submissionImg').data('fullview-src')
   if (!imageSrc) {
@@ -76,7 +79,10 @@ const fetchGallery = async ({ db, browser, logger, user, fetchedAll, prefix, uri
   let i = 1
   while (uri) {
     logger(`${prefix} - Page ${i}`)
-    const $ = await browser.fetchCheerio(domain + uri)
+    const $ = cheerio.load(await cloudscraper({
+      jar: browser.cookiejar,
+      uri: domain
+    }))
     const submissions = []
     $('.gallery .t-image b u a').each((_, elem) => {
       const link = $(elem).attr('href')
