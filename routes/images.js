@@ -3,7 +3,7 @@
 const config = require('../utils/config')
 const { normalize, join } = require('path')
 
-const sharp = require('sharp')
+// const sharp = require('sharp')
 const { readFile } = require('fs-extra')
 const express = require('express')
 
@@ -33,6 +33,7 @@ module.exports = (db) => {
 
     const data = await readFile(join(config.imageRoot, context.filename))
 
+    /*
     if (context.ext !== 'gif' || context.preview) {
       let image = sharp(data)
       const meta = await image.metadata()
@@ -53,6 +54,8 @@ module.exports = (db) => {
     } else {
       context.buffer = data
     }
+    */
+    context.buffer = data
     return context
   }
 
