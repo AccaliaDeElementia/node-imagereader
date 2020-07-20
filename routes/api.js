@@ -184,15 +184,18 @@ module.exports = (db) => {
   router.get('/description/*', async (req, res) => {
     const image = '/' + (req.params[0] || '')
     if (image !== normalize(image)) {
-      throw new ExpressError('Directory traversal iis not allowed', 403)
+      // eslint-disable-next-line no-undef
+      throw new ExpressError('Directory traversal is not allowed', 403)
     }
     try {
       const data = await readFile(join(config.imageRoot, `${image}.txt`))
       res.send(data)
     } catch (e) {
-      console.error(e)
+      if (e.code !== 'ENOENT') {
+        console.error(e)
+      }
       res.send('')
-    }    
+    }
   })
   router.post('/navigate/latest', async (req, res) => {
     await setLatest(db, req.body.path)

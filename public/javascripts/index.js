@@ -63,11 +63,11 @@ function MainImage () {
     $('.status-bar .center, .description-title .title').text(pic.name)
     $('.status-bar .left').text(`(${index + 1}/${picturereaderdata.pictures.length})`)
     $.post('/api/navigate/latest', { path: pic.path })
-    $('#mainImage img').attr('src', `/images/${$('#mainImage').width()}-${$('#mainImage').height()}${pic.path}`).data('path', pic.path).data('index', index)
+    $('#mainImage img').attr('src', `/images/${pic.path}`).data('path', pic.path).data('index', index)
     after()
   }
   const loadDescription = pic => {
-    if (!pic || !pic.path){
+    if (!pic || !pic.path) {
       $('.menu-block .description').empty()
       $('#navigation-tab').tab('show')
       $('.has_description').hide()
@@ -208,16 +208,16 @@ function Navigation () {
   })
   document.onkeyup = (evt) => {
     let keys = {
-      'ARROWUP': () => $('#mainMenu').trigger('showMenu'),
-      'ARROWDOWN': () => $('#mainMenu').trigger('hideMenu'),
-      'ARROWRIGHT': () => $('#mainImage').trigger('next'),
-      'ARROWLEFT': () => $('#mainImage').trigger('previous'),
-      'HOME': () => $('#mainImage').trigger('first'),
-      'END': () => $('#mainImage').trigger('last')
+      ARROWUP: () => $('#mainMenu').trigger('showMenu'),
+      ARROWDOWN: () => $('#mainMenu').trigger('hideMenu'),
+      ARROWRIGHT: () => $('#mainImage').trigger('next'),
+      ARROWLEFT: () => $('#mainImage').trigger('previous'),
+      HOME: () => $('#mainImage').trigger('first'),
+      END: () => $('#mainImage').trigger('last')
     }
     if ($('#mainMenu').is(':visible')) {
       keys = {
-        'ARROWDOWN': () => $('#mainMenu').trigger('hideMenu'),
+        ARROWDOWN: () => $('#mainMenu').trigger('hideMenu')
       }
     }
     var key = (evt.ctrlKey ? '<CTRL>' : '') +

@@ -3,7 +3,7 @@
 const config = require('../utils/config')
 const { normalize, join } = require('path')
 
-// const sharp = require('sharp')
+const sharp = require('sharp')
 const { readFile } = require('fs-extra')
 const express = require('express')
 
@@ -32,19 +32,12 @@ module.exports = (db) => {
     context.ext = context.filename.split('.').pop().toLowerCase()
 
     const data = await readFile(join(config.imageRoot, context.filename))
-
-    /*
-    if (context.ext !== 'gif' || context.preview) {
+    if (context.preview) {
       let image = sharp(data)
-      const meta = await image.metadata()
-      if (meta.format === 'gif' && !context.preview) {
-        context.buffer = data
-        return context
-      }
       if (+context.width || +context.height) {
         image = image.rotate().resize({
-          width: +context.width || undefined,
-          height: +context.height || undefined,
+          width: context.width,
+          height: context.height,
           fit: sharp.fit.inside,
           withoutEnlargement: true
         })
@@ -54,8 +47,6 @@ module.exports = (db) => {
     } else {
       context.buffer = data
     }
-    */
-    context.buffer = data
     return context
   }
 
